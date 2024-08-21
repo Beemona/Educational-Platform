@@ -1,0 +1,43 @@
+﻿@model List<QuestionModel.Models.Question>
+
+@using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
+{
+    <div class="form-group">
+        <label for="studentName">Your Name:</label>
+        <input type="text" id="studentName" name="studentName" class="form-control" required />
+
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p>No questions available.</p>
+    }
+    else
+    {
+        @foreach (var question in Model)
+        {
+            <div>
+                <h3>@question.Text</h3>
+                @if (question.Options != null)
+                {
+                    @foreach (var option in question.Options)
+                    {
+                        <label>
+                            <input type="radio" name="answers[@question.Id]" value="@option.Value" />
+                            @option.Value. @option.Text
+                        </label>
+                        <br />
+                    }
+                }
+                else
+                {
+                    <p>No options available for this question.</p>
+                }
+            </div>
+            <hr />
+        }
+
+        <!-- Submit button -->
+        <button type="submit" class="btn btn-primary">Submit Quiz</button>
+    }
+}

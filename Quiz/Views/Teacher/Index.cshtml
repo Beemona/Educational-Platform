@@ -1,0 +1,97 @@
+﻿@model List<StudentModel.Models.StudentResult>
+
+<h1>Student Results</h1>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No student results available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Score</th>
+                <th>Total Questions</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var studentResult in Model)
+            {
+                <tr>
+                    <td>@studentResult.StudentName</td>
+                    <td>@studentResult.Score</td>
+                    <td>@studentResult.TotalQuestions</td>
+                    <td>
+                        <a href="#" data-toggle="modal" data-target="#detailsModal" data-student="@studentResult.StudentName">View Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Modal for displaying question results -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Question Results</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="resultDetailsList"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var studentName = button.data('student'); // Extract info from data-* attributes
+
+                var modal = $(this);
+                modal.find('.modal-title').text('Details for ' + studentName);
+
+                var resultDetailsList = modal.find('#resultDetailsList');
+                resultDetailsList.empty();
+
+                // Serialize the student results to JSON
+                var studentResults = @Html.Raw(Json.Serialize(Model));
+                console.log('Student Results:', studentResults);
+
+                // Find the selected student by name
+                var selectedStudent = studentResults.find(r => r.studentName === studentName);
+                console.log('Selected Student:', selectedStudent);
+
+                if (selectedStudent) {
+                    if (selectedStudent.resultDetails && selectedStudent.resultDetails.length > 0) {
+                        selectedStudent.resultDetails.forEach(function (result, index) {
+                            resultDetailsList.append(
+                                '<li>' +
+                                '<strong>Question ' + (index + 1) + ':</strong> ' + result.questionText + '<br />' +
+                                '<strong>Your Answer:</strong> ' + result.selectedAnswer + '<br />' +
+                                '<strong>Correct Answer:</strong> ' + result.correctAnswer +
+                                '</li><hr />'
+                            );
+                        });
+                    } else {
+                        resultDetailsList.append('<li>No details available for this student.</li>');
+                    }
+                } else {
+                    resultDetailsList.append('<li>No student found with this name.</li>');
+                }
+            });
+        });
+    </script>
+}

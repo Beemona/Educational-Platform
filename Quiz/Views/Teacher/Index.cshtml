@@ -57,8 +57,8 @@ else
     <script>
         $(document).ready(function () {
             $('#detailsModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var studentName = button.data('student'); // Extract info from data-* attributes
+                var button = $(event.relatedTarget);
+                var studentName = button.data('student');
 
                 var modal = $(this);
                 modal.find('.modal-title').text('Details for ' + studentName);
@@ -66,10 +66,8 @@ else
                 var resultDetailsList = modal.find('#resultDetailsList');
                 resultDetailsList.empty();
 
-                // Serialize the student results to JSON
                 var studentResults = @Html.Raw(Json.Serialize(Model));
 
-                // Find the selected student by name
                 var selectedStudent = studentResults.find(r => r.studentName === studentName);
 
                 if (selectedStudent) {
@@ -77,10 +75,10 @@ else
                         selectedStudent.resultDetails.forEach(function (result, index) {
                             resultDetailsList.append(
                                 '<li>' +
-                                '<strong>Question ' + (index + 1) + ':</strong> ' + result.questionText + '<br />' +
-                                '<strong>Your Answer:</strong> ' + getOptionText(result.selectedAnswer) + '<br />' +
-                                '<strong>Correct Answer:</strong> ' + getOptionText(result.correctAnswer) + '<br />' +
-                                '<strong>Points:</strong> ' + result.points.toFixed(2) +
+                                '<strong>Question ' + (index + 1) + ':</strong> ' + (result.questionText || 'N/A') + '<br />' +
+                                '<strong>Your Answer:</strong> ' + (result.selectedAnswer || 'N/A') + '<br />' +
+                                '<strong>Correct Answer:</strong> ' + (result.correctAnswer || 'N/A') + '<br />' +
+                                '<strong>Points:</strong> ' + (result.points ? result.points.toFixed(2) : '0.00') +
                                 '</li><hr />'
                             );
                         });
@@ -91,18 +89,8 @@ else
                     resultDetailsList.append('<li>No student found with this name.</li>');
                 }
             });
-
-            // Helper function to map answer value to text
-            function getOptionText(value) {
-                switch (value) {
-                    case 'A': return 'A';
-                    case 'B': return 'B';
-                    case 'C': return 'C';
-                    case 'D': return 'D';
-                    default: return 'N/A'; // Handle any unexpected values
-                }
-            }
         });
     </script>
+
 }
 

@@ -7,7 +7,6 @@ namespace QuestionModel.Models
     {
         public int Id { get; set; }
         public string? Text { get; set; }
-        //public List<OptionModel.Models.Option>? Options { get; set; }
         public List<Option> Options { get; set; }
         public string? CorrectAnswer { get; set; } // Can store "A", "B", "C", or "D"
         public decimal Points { get; set; }

@@ -20,12 +20,6 @@ namespace Quiz.Controllers
         }
 
         // Display student results
-        //public IActionResult Index()
-        //{
-        //    var studentResults = _studentResultService.GetAllResults();
-        //    return View(studentResults); // Ensure this view expects a List<StudentResult>
-        //}
-
         public IActionResult Index()
         {
             var studentResults = _studentResultService.GetAllResults();
@@ -58,37 +52,6 @@ namespace Quiz.Controllers
 
             return View(viewModel);
         }
-
-
-        // POST: Teacher/AddQuestion
-        // POST: Teacher/AddQuestion
-        //[HttpPost]
-        //public IActionResult AddQuestion(QuestionViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var question = new Question
-        //        {
-        //            Text = model.Text,
-        //            CorrectAnswer = model.CorrectAnswer,
-        //            Points = model.Points,  // Changed from Percentage to Points
-        //            Options = model.Options.Select(o => new Option
-        //            {
-        //                Text = o.Text,
-        //                Value = o.Value
-        //            }).ToList()
-        //        };
-
-        //        _questionService.AddQuestion(question);
-
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    // If the model is invalid, return the same view with the model to display validation errors
-        //    return View(model);
-        //}
-
-
 
         // POST: Teacher/AddQuestion
         [HttpPost]
@@ -174,8 +137,3 @@ namespace Quiz.Controllers
 
     }
 }
-
-
-///////////////////////////////////////////////////////////////
-
-

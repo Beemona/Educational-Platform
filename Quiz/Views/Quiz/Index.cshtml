@@ -1,28 +1,29 @@
-﻿@model List<QuestionModel.Models.Question>
+﻿@model QuizViewModel
 
 @using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
 {
     <div class="form-group">
         <label for="studentName">Your Name:</label>
-        <input type="text" id="studentName" name="studentName" class="form-control" required />
+        <input type="text" id="studentName" name="StudentName" class="form-control" required />
     </div>
 
-    @if (Model == null || !Model.Any())
+    @if (Model.Questions == null || !Model.Questions.Any())
     {
         <p>No questions available.</p>
     }
     else
     {
-        @foreach (var question in Model)
+        @for (var i = 0; i < Model.Questions.Count; i++)
         {
+            var question = Model.Questions[i];
             <div>
-                <h3>@question.Text</h3>
+                <h3>@question.QuestionText</h3>
                 @if (question.Options != null)
                 {
                     @foreach (var option in question.Options)
                     {
                         <label>
-                            <input type="radio" name="answers[@question.Id]" value="@option.Value" />
+                            <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Value" />
                             @option.Value. @option.Text
                         </label>
                         <br />

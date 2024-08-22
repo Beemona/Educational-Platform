@@ -20,42 +20,75 @@ namespace Quiz.Controllers
         }
 
         // Display student results
+        //public IActionResult Index()
+        //{
+        //    var studentResults = _studentResultService.GetAllResults();
+        //    return View(studentResults); // Ensure this view expects a List<StudentResult>
+        //}
+
         public IActionResult Index()
         {
             var studentResults = _studentResultService.GetAllResults();
-
-            // Log for debugging
-            Console.WriteLine($"Fetched {studentResults.Count} student results");
-
-            return View(studentResults);
+            return View(studentResults); // Ensure this view expects a List<StudentResult>
         }
+
+
+
         // GET: Teacher/Questions
         public IActionResult Questions()
         {
-            var questions = _questionService.GetAllQuestions(); // Fetch all questions
-
-            // Log for debugging
-            Console.WriteLine($"Fetched {questions.Count} questions");
-
+            var questions = _questionService.GetAllQuestions();
             return View(questions); // Pass questions to the view
         }
+
 
         // GET: Teacher/AddQuestion
         public IActionResult AddQuestion()
         {
-            var viewModel = new QuestionViewModel
+            var viewModel = new QuestionModel.ViewModels.QuestionViewModel
             {
-                Options = new List<OptionViewModel>
-                {
-                    new OptionViewModel { Value = "A" },
-                    new OptionViewModel { Value = "B" },
-                    new OptionViewModel { Value = "C" },
-                    new OptionViewModel { Value = "D" }
-                }
+                Options = new List<QuestionModel.ViewModels.OptionViewModel>
+        {
+            new QuestionModel.ViewModels.OptionViewModel { Value = "A" },
+            new QuestionModel.ViewModels.OptionViewModel { Value = "B" },
+            new QuestionModel.ViewModels.OptionViewModel { Value = "C" },
+            new QuestionModel.ViewModels.OptionViewModel { Value = "D" }
+        }
             };
 
             return View(viewModel);
         }
+
+
+        // POST: Teacher/AddQuestion
+        // POST: Teacher/AddQuestion
+        //[HttpPost]
+        //public IActionResult AddQuestion(QuestionViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var question = new Question
+        //        {
+        //            Text = model.Text,
+        //            CorrectAnswer = model.CorrectAnswer,
+        //            Points = model.Points,  // Changed from Percentage to Points
+        //            Options = model.Options.Select(o => new Option
+        //            {
+        //                Text = o.Text,
+        //                Value = o.Value
+        //            }).ToList()
+        //        };
+
+        //        _questionService.AddQuestion(question);
+
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    // If the model is invalid, return the same view with the model to display validation errors
+        //    return View(model);
+        //}
+
+
 
         // POST: Teacher/AddQuestion
         [HttpPost]
@@ -67,7 +100,7 @@ namespace Quiz.Controllers
                 {
                     Text = model.Text,
                     CorrectAnswer = model.CorrectAnswer,
-                    Percentage = model.Percentage,
+                    Points = model.Points,
                     Options = model.Options.Select(o => new Option
                     {
                         Text = o.Text,
@@ -75,13 +108,15 @@ namespace Quiz.Controllers
                     }).ToList()
                 };
 
-                _questionService.AddQuestion(question); // Save to data store
+                _questionService.AddQuestion(question);
 
-                return RedirectToAction("Index"); // Redirect to the question list view
+                return RedirectToAction("Index");
             }
 
+            // If the model is invalid, return the same view with the model to display validation errors
             return View(model);
         }
+
 
 
         // GET: Teacher/EditQuestion/5
@@ -96,11 +131,11 @@ namespace Quiz.Controllers
 
             var viewModel = new QuestionViewModel
             {
-                Id = question.Id, // Make sure this is set
+                Id = question.Id,
                 Text = question.Text,
                 CorrectAnswer = question.CorrectAnswer,
-                Percentage = question.Percentage,
-                Options = question.Options.Select(o => new OptionViewModel
+                Points = question.Points,
+                Options = question.Options.Select(o => new QuestionModel.ViewModels.OptionViewModel
                 {
                     Text = o.Text,
                     Value = o.Value
@@ -110,7 +145,6 @@ namespace Quiz.Controllers
             return View(viewModel);
         }
 
-
         // POST: Teacher/EditQuestion/5
         [HttpPost]
         public IActionResult EditQuestion(int id, QuestionViewModel model)
@@ -119,10 +153,10 @@ namespace Quiz.Controllers
             {
                 var question = new Question
                 {
-                    Id = id, // Ensure this is correctly assigned
+                    Id = id,
                     Text = model.Text,
                     CorrectAnswer = model.CorrectAnswer,
-                    Percentage = model.Percentage,
+                    Points = model.Points,
                     Options = model.Options.Select(o => new Option
                     {
                         Text = o.Text,
@@ -140,3 +174,8 @@ namespace Quiz.Controllers
 
     }
 }
+
+
+///////////////////////////////////////////////////////////////
+
+

@@ -6,19 +6,18 @@ public class StudentResultService : IStudentResultService
 {
     private readonly List<StudentResult> _studentResults = new List<StudentResult>();
 
-    // Method to get all student results
     public List<StudentResult> GetAllResults()
     {
         return _studentResults;
     }
 
-    // Method to save a student result
-   public void SaveStudentResult(StudentResult studentResult)
-{
-    _studentResults.Add(studentResult);
+    public void SaveStudentResult(StudentResult studentResult)
+    {
+        _studentResults.Add(studentResult);
+    }
 }
 
-}
+
 
 
 

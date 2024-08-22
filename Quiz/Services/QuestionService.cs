@@ -2,7 +2,7 @@
 
 public class QuestionService : IQuestionService
 {
-    private readonly List<Question> _questions = new List<Question>();
+    protected readonly List<Question> _questions = new List<Question>();
 
     public void AddQuestion(Question question)
     {

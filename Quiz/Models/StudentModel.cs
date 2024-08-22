@@ -1,11 +1,12 @@
-﻿namespace StudentModel.Models
+﻿using QuestionModel.Models;
+
+namespace StudentModel.Models
 {
     public class StudentResult
     {
         public string StudentName { get; set; }
-        public int? Score { get; set; }
-        public int? TotalQuestions { get; set; }
-        public List<QuestionModel.Models.QuestionResult>? ResultDetails { get; set; }
-        public StudentResult() => ResultDetails = new List<QuestionModel.Models.QuestionResult>();
+        public decimal Score { get; set; } // Make sure Score is a decimal or double
+        public int TotalQuestions { get; set; }
+        public List<QuestionResult> ResultDetails { get; set; } // This should match your actual model
     }
 }

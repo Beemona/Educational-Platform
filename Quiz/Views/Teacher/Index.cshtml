@@ -22,7 +22,7 @@ else
             {
                 <tr>
                     <td>@studentResult.StudentName</td>
-                    <td>@studentResult.Score</td>
+                    <td>@studentResult.Score.ToString("F2")</td>
                     <td>@studentResult.TotalQuestions</td>
                     <td>
                         <a href="#" data-toggle="modal" data-target="#detailsModal" data-student="@studentResult.StudentName">View Details</a>
@@ -68,11 +68,9 @@ else
 
                 // Serialize the student results to JSON
                 var studentResults = @Html.Raw(Json.Serialize(Model));
-                console.log('Student Results:', studentResults);
 
                 // Find the selected student by name
                 var selectedStudent = studentResults.find(r => r.studentName === studentName);
-                console.log('Selected Student:', selectedStudent);
 
                 if (selectedStudent) {
                     if (selectedStudent.resultDetails && selectedStudent.resultDetails.length > 0) {
@@ -80,8 +78,9 @@ else
                             resultDetailsList.append(
                                 '<li>' +
                                 '<strong>Question ' + (index + 1) + ':</strong> ' + result.questionText + '<br />' +
-                                '<strong>Your Answer:</strong> ' + result.selectedAnswer + '<br />' +
-                                '<strong>Correct Answer:</strong> ' + result.correctAnswer +
+                                '<strong>Your Answer:</strong> ' + getOptionText(result.selectedAnswer) + '<br />' +
+                                '<strong>Correct Answer:</strong> ' + getOptionText(result.correctAnswer) + '<br />' +
+                                '<strong>Points:</strong> ' + result.points.toFixed(2) +
                                 '</li><hr />'
                             );
                         });
@@ -92,6 +91,18 @@ else
                     resultDetailsList.append('<li>No student found with this name.</li>');
                 }
             });
+
+            // Helper function to map answer value to text
+            function getOptionText(value) {
+                switch (value) {
+                    case 'A': return 'A';
+                    case 'B': return 'B';
+                    case 'C': return 'C';
+                    case 'D': return 'D';
+                    default: return 'N/A'; // Handle any unexpected values
+                }
+            }
         });
     </script>
 }
+

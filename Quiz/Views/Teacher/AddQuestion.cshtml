@@ -1,46 +1,28 @@
 ﻿@model QuestionModel.ViewModels.QuestionViewModel
 
-@{
-    ViewData["Title"] = "Add Question";
-}
-
-<h1>Add Question</h1>
-
 @using (Html.BeginForm("AddQuestion", "Teacher", FormMethod.Post))
 {
     <div class="form-group">
         <label for="Text">Question Text:</label>
-        <input type="text" id="Text" name="Text" class="form-control" required />
+        <input type="text" id="Text" name="Text" class="form-control" value="@Model.Text" required />
     </div>
 
-    <div class="form-group">
-        <label for="OptionA">Option A:</label>
-        <input type="text" id="OptionA" name="Options[0].Text" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label for="OptionB">Option B:</label>
-        <input type="text" id="OptionB" name="Options[1].Text" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label for="OptionC">Option C:</label>
-        <input type="text" id="OptionC" name="Options[2].Text" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label for="OptionD">Option D:</label>
-        <input type="text" id="OptionD" name="Options[3].Text" class="form-control" required />
-    </div>
+    @for (var i = 0; i < Model.Options.Count; i++)
+    {
+        <div class="form-group">
+            <label for="Option_@i">Option @Model.Options[i].Value:</label>
+            <input type="text" id="Option_@i" name="Options[@i].Text" class="form-control" value="@Model.Options[i].Text" required />
+        </div>
+    }
 
     <div class="form-group">
         <label for="CorrectAnswer">Correct Answer (A, B, C, D):</label>
-        <input type="text" id="CorrectAnswer" name="CorrectAnswer" class="form-control" required />
+        <input type="text" id="CorrectAnswer" name="CorrectAnswer" class="form-control" value="@Model.CorrectAnswer" required />
     </div>
 
     <div class="form-group">
-        <label for="Percentage">Percentage:</label>
-        <input type="number" id="Percentage" name="Percentage" class="form-control" required />
+        <label for="Points">Points:</label>
+        <input type="number" step="0.01" id="Points" name="Points" class="form-control" value="@Model.Points" required />
     </div>
 
     <button type="submit" class="btn btn-primary">Add Question</button>

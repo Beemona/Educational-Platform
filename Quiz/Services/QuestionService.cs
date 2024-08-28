@@ -16,8 +16,14 @@ public class QuestionService : IQuestionService
 
     public Question GetQuestionById(int id)
     {
-        return _questions.FirstOrDefault(q => q.Id == id);
+        var question = _questions.FirstOrDefault(q => q.Id == id);
+        if (question == null)
+        {
+            throw new KeyNotFoundException($"No question found with ID {id}");
+        }
+        return question;
     }
+
 
     public void UpdateQuestion(Question question)
     {

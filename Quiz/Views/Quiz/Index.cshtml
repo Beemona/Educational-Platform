@@ -1,4 +1,4 @@
-﻿@model QuizViewModel
+﻿@model Quiz.Models.QuizViewModel
 
 @using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
 {
@@ -24,7 +24,7 @@
                     {
                         <label>
                             <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Value" />
-                            @option.Value @option.Text
+                            @option.Text
                         </label>
                         <br />
                     }
@@ -37,7 +37,6 @@
             <hr />
         }
 
-        <!-- Submit button -->
         <button type="submit" class="btn btn-primary">Submit Quiz</button>
     }
 }

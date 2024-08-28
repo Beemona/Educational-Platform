@@ -25,7 +25,9 @@ else
                     <td>@studentResult.Score.ToString("F2")</td>
                     <td>@studentResult.TotalQuestions</td>
                     <td>
-                        <a href="#" data-toggle="modal" data-target="#detailsModal" data-student="@studentResult.StudentName">View Details</a>
+                        <a href="#" data-toggle="modal" data-target="#detailsModal"
+                           data-student="@studentResult.StudentName"
+                           data-details='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(studentResult.ResultDetails))'>View Details</a>
                     </td>
                 </tr>
             }
@@ -55,42 +57,34 @@ else
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('#detailsModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var studentName = button.data('student');
+        $('#detailsModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var studentName = button.data('student');
+            var resultDetails = button.data('details'); // Extract details data
 
-                var modal = $(this);
-                modal.find('.modal-title').text('Details for ' + studentName);
+            console.log('Student Name:', studentName);
+            console.log('Result Details:', resultDetails);
 
-                var resultDetailsList = modal.find('#resultDetailsList');
-                resultDetailsList.empty();
+            var modal = $(this);
+            modal.find('.modal-title').text('Details for ' + studentName);
 
-                var studentResults = @Html.Raw(Json.Serialize(Model));
+            var resultDetailsList = modal.find('#resultDetailsList');
+            resultDetailsList.empty();
 
-                var selectedStudent = studentResults.find(r => r.studentName === studentName);
-
-                if (selectedStudent) {
-                    if (selectedStudent.resultDetails && selectedStudent.resultDetails.length > 0) {
-                        selectedStudent.resultDetails.forEach(function (result, index) {
-                            resultDetailsList.append(
-                                '<li>' +
-                                '<strong>Question ' + (index + 1) + ':</strong> ' + (result.questionText || 'N/A') + '<br />' +
-                                '<strong>Your Answer:</strong> ' + (result.selectedAnswer || 'N/A') + '<br />' +
-                                '<strong>Correct Answer:</strong> ' + (result.correctAnswer || 'N/A') + '<br />' +
-                                '<strong>Points:</strong> ' + (result.points ? result.points.toFixed(2) : '0.00') +
-                                '</li><hr />'
-                            );
-                        });
-                    } else {
-                        resultDetailsList.append('<li>No details available for this student.</li>');
-                    }
-                } else {
-                    resultDetailsList.append('<li>No student found with this name.</li>');
-                }
-            });
+            if (Array.isArray(resultDetails) && resultDetails.length > 0) {
+                resultDetails.forEach(function (result, index) {
+                    resultDetailsList.append(
+                        '<li>' +
+                        '<strong>Question ' + (index + 1) + ':</strong> ' + (result.QuestionText || 'NOT FOUND') + '<br />' +
+                        '<strong>Your Answer:</strong> ' + (result.SelectedAnswer || 'NOT FOUND') + '<br />' +
+                        '<strong>Correct Answer:</strong> ' + (result.CorrectAnswer || 'NOT FOUND') + '<br />' +
+                        '<strong>Points:</strong> ' + (result.Points !== undefined ? result.Points.toFixed(2) : 'NOT FOUND') +
+                        '</li><hr />'
+                    );
+                });
+            } else {
+                resultDetailsList.append('<li>No details available for this student.</li>');
+            }
         });
     </script>
-
 }
-

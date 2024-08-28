@@ -1,34 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Quiz Results";
-    var resultDetails = ViewBag.ResultDetails as List<QuestionModel.Models.QuestionResult>;
-}
+﻿@* @model StudentResult
 
-<h1>Quiz Results</h1>
-<p>Your score: @ViewBag.Score out of @ViewBag.TotalQuestions</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Quiz Results</title>
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
+</head>
+<body>
+    <h1>Quiz Results</h1>
 
-@if (resultDetails != null)
-{
-    <table class="table">
+    <p><strong>Student Name:</strong> @Model.StudentName</p>
+    <p><strong>Score:</strong> @Model.Score</p>
+    <p><strong>Total Questions:</strong> @Model.TotalQuestions</p>
+
+    <h2>Details</h2>
+    <table>
         <thead>
             <tr>
                 <th>Question</th>
-                <th>Your Answer</th>
+                <th>Selected Answer</th>
                 <th>Correct Answer</th>
+                <th>Points</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var result in resultDetails)
+            @foreach (var detail in Model.ResultDetails)
             {
                 <tr>
-                    <td>@result.QuestionText</td>
-                    <td>@result.SelectedAnswer</td>
-                    <td>@result.CorrectAnswer</td>
+                    <td>@detail.QuestionText</td>
+                    <td>@detail.SelectedAnswer</td>
+                    <td>@detail.CorrectAnswer</td>
+                    <td>@detail.Points</td>
                 </tr>
             }
         </tbody>
     </table>
-}
-else
-{
-    <p>No results to display.</p>
-}
+
+    <a href="@Url.Action("Index", "Quiz")">Take Another Quiz</a>
+</body>
+</html>
+ *@

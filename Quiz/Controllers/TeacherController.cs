@@ -22,10 +22,12 @@ namespace Quiz.Controllers
         // Display student results
         public IActionResult Index()
         {
-            var studentResults = _studentResultService.GetAllResults();
-            return View(studentResults); // Ensure this view expects a List<StudentResult>
-        }
+            // Retrieve all student results from the service
+            List<StudentResult> studentResults = _studentResultService.GetAllResults();
 
+            // Pass the student results to the view
+            return View(studentResults);
+        }
 
 
         // GET: Teacher/Questions
@@ -62,21 +64,19 @@ namespace Quiz.Controllers
                 var question = new Question
                 {
                     Text = model.Text,
-                    CorrectAnswer = model.CorrectAnswer,
                     Points = model.Points,
-                    Options = model.Options.Select(o => new Option
+                    Options = model.Options?.Select((option, index) => new Option
                     {
-                        Text = o.Text,
-                        Value = o.Value
-                    }).ToList()
+                        Text = option.Text,
+                        Value = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index].ToString()
+                    }).ToList(),
+                    CorrectAnswer = model.CorrectAnswer // This should match the selected value
                 };
 
                 _questionService.AddQuestion(question);
-
                 return RedirectToAction("Index");
             }
 
-            // If the model is invalid, return the same view with the model to display validation errors
             return View(model);
         }
 
@@ -98,7 +98,7 @@ namespace Quiz.Controllers
                 Text = question.Text,
                 CorrectAnswer = question.CorrectAnswer,
                 Points = question.Points,
-                Options = question.Options.Select(o => new QuestionModel.ViewModels.OptionViewModel
+                Options = question.Options?.Select(o => new QuestionModel.ViewModels.OptionViewModel
                 {
                     Text = o.Text,
                     Value = o.Value
@@ -120,7 +120,7 @@ namespace Quiz.Controllers
                     Text = model.Text,
                     CorrectAnswer = model.CorrectAnswer,
                     Points = model.Points,
-                    Options = model.Options.Select(o => new Option
+                    Options = model.Options?.Select(o => new Option
                     {
                         Text = o.Text,
                         Value = o.Value
@@ -134,6 +134,7 @@ namespace Quiz.Controllers
 
             return View(model);
         }
+
 
     }
 }

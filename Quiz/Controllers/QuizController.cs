@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuestionModel.Models;
+using Quiz.Models;
 using StudentModel.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,16 +18,38 @@ namespace QuizController.Controllers
             _questionService = questionService;
         }
 
+        // GET: /Quiz/Index
+        //public IActionResult Index()
+        //{
+        //    var questions = _questionService.GetAllQuestions();
+        //    var viewModel = new QuizViewModel
+        //    {
+        //        Questions = questions.Select(q => new QuestionAnswerViewModel
+        //        {
+        //            QuestionId = q.Id,
+        //            QuestionText = q.Text!,
+        //            Options = q.Options?.Select(o => new OptionViewModel
+        //            {
+        //                Value = o.Value!,
+        //                Text = o.Text!
+        //            }).ToList()
+        //        }).ToList()
+        //    };
+
+        //    return View(viewModel);
+        //}
+
         public IActionResult Index()
         {
             var questions = _questionService.GetAllQuestions();
+
             var viewModel = new QuizViewModel
             {
                 Questions = questions.Select(q => new QuestionAnswerViewModel
                 {
                     QuestionId = q.Id,
                     QuestionText = q.Text,
-                    Options = q.Options.Select(o => new OptionViewModel
+                    Options = q.Options?.Select(o => new Quiz.Models.OptionViewModel
                     {
                         Value = o.Value,
                         Text = o.Text
@@ -37,28 +60,34 @@ namespace QuizController.Controllers
             return View(viewModel);
         }
 
-
-        // POST: SubmitQuiz
+        // POST: /Quiz/SubmitQuiz
         [HttpPost]
-        public IActionResult SubmitQuiz(string studentName, Dictionary<string, string> questions)
+        public IActionResult SubmitQuiz(QuizViewModel model)
         {
-            if (string.IsNullOrEmpty(studentName) || questions == null)
+            if (!ModelState.IsValid)
             {
-                return View("Error", new { message = "Invalid submission." });
+                return View(model);
             }
 
-            var questionsList = _questionService.GetAllQuestions();
+            var questions = _questionService.GetAllQuestions();
             decimal score = 0;
             var resultDetails = new List<QuestionResult>();
 
-            foreach (var question in questionsList)
+            foreach (var question in model.Questions)
             {
-                var questionId = question.Id.ToString();
-                var selectedAnswerKey = questions.ContainsKey(questionId) ? questions[questionId] : null;
+                // Log the received data
+                System.Diagnostics.Debug.WriteLine($"QuestionId: {question.QuestionId}, SelectedAnswer: {question.SelectedAnswer}");
+            }
 
-                var selectedOption = question.Options.FirstOrDefault(o => o.Value == selectedAnswerKey);
-                var correctOption = question.Options.FirstOrDefault(o => o.Value == question.CorrectAnswer);
-                var isCorrect = selectedAnswerKey == question.CorrectAnswer;
+            foreach (var question in questions)
+            {
+                var selectedAnswer = model.Questions?
+                    .FirstOrDefault(q => q.QuestionId == question.Id)?
+                    .SelectedAnswer;
+
+                var selectedOption = question.Options?.FirstOrDefault(o => o.Value == selectedAnswer);
+                var correctOption = question.Options?.FirstOrDefault(o => o.Value == question.CorrectAnswer);
+                var isCorrect = selectedAnswer == question.CorrectAnswer;
 
                 if (isCorrect)
                 {
@@ -76,9 +105,9 @@ namespace QuizController.Controllers
 
             var studentResult = new StudentResult
             {
-                StudentName = studentName,
+                StudentName = model.StudentName,
                 Score = score,
-                TotalQuestions = questionsList.Count,
+                TotalQuestions = questions.Count,
                 ResultDetails = resultDetails
             };
 
@@ -89,4 +118,3 @@ namespace QuizController.Controllers
 
     }
 }
-

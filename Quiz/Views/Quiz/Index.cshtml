@@ -23,6 +23,50 @@
                     @foreach (var option in question.Options)
                     {
                         <label>
+                            <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Text" />
+                            @option.Text
+                        </label>
+                        <br />
+                    }
+                }
+                else
+                {
+                    <p>No options available for this question.</p>
+                }
+            </div>
+            <hr />
+        }
+
+        <button type="submit" class="btn btn-primary">Submit Quiz</button>
+    }
+}
+
+
+@* @model Quiz.Models.QuizViewModel
+
+@using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
+{
+    <div class="form-group">
+        <label for="studentName">Your Name:</label>
+        <input type="text" id="studentName" name="StudentName" class="form-control" required />
+    </div>
+
+    @if (Model.Questions == null || !Model.Questions.Any())
+    {
+        <p>No questions available.</p>
+    }
+    else
+    {
+        @for (var i = 0; i < Model.Questions.Count; i++)
+        {
+            var question = Model.Questions[i];
+            <div>
+                <h3>@question.QuestionText</h3>
+                @if (question.Options != null)
+                {
+                    @foreach (var option in question.Options)
+                    {
+                        <label>
                             <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Value" />
                             @option.Text
                         </label>
@@ -40,3 +84,4 @@
         <button type="submit" class="btn btn-primary">Submit Quiz</button>
     }
 }
+ *@

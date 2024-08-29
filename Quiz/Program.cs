@@ -1,16 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using QuizDbContext.Data;
+using QuizDbContext.Services; 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Register the service as Singleton
-builder.Services.AddSingleton<IStudentResultService, StudentResultService>();
-builder.Services.AddSingleton<IQuestionService, QuestionService>();
+// Configure Entity Framework Core with SQL Server using Windows Authentication
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register your services
+builder.Services.AddScoped<IStudentResultService, StudentResultService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IQuizService, QuizService>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-app.UseRouting();
-app.UseAuthorization();
-
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -19,6 +27,18 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+    // endpoints.MapRazorPages(); // If you're using Razor Pages
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

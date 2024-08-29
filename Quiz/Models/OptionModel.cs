@@ -1,10 +1,19 @@
-﻿namespace OptionModel.Models
+﻿using QuestionModel.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace OptionModel.Models
 {
     public class Option
     {
-        public int Id { get; set; }
-        public string? Text { get; set; }
-        public string? Value { get; set; } // e.g., "A", "B", "C", "D"
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; } // Maps to OptionId
+        public string? Text { get; set; } // Maps to OptionText
         public int QuestionId { get; set; } // Foreign key to the associated question
+        public bool IsCorrect { get; set; }  // Maps to IsCorrect (1 for true, 0 for false) NEW!!
+
+        public Question? Question { get; set; } // Navigation property
     }
 }
+ //    public string? Value { get; set; } // e.g., "A", "B", "C", "D" OLD!!

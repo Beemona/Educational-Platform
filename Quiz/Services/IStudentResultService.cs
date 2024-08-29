@@ -9,4 +9,6 @@ public interface IStudentResultService
 
     // Method to save a student result
     void SaveStudentResult(StudentResult studentResult);
+
+    Task SaveStudentResultAsync(StudentResult studentResult);
 }

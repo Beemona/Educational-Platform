@@ -5,9 +5,12 @@ using QuestionModel.ViewModels;
 using StudentModel.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Quiz.Controllers
 {
+    [Route("Teacher")]
     public class TeacherController : Controller
     {
         private readonly IStudentResultService _studentResultService;
@@ -19,45 +22,43 @@ namespace Quiz.Controllers
             _questionService = questionService;
         }
 
-        // Display student results
+        // GET: Teacher/Index
+        [HttpGet("Index")]
         public IActionResult Index()
         {
-            // Retrieve all student results from the service
             List<StudentResult> studentResults = _studentResultService.GetAllResults();
-
-            // Pass the student results to the view
             return View(studentResults);
         }
 
-
         // GET: Teacher/Questions
+        [HttpGet("Questions")]
         public IActionResult Questions()
         {
             var questions = _questionService.GetAllQuestions();
-            return View(questions); // Pass questions to the view
+            return View(questions);
         }
-
 
         // GET: Teacher/AddQuestion
         public IActionResult AddQuestion()
         {
-            var viewModel = new QuestionModel.ViewModels.QuestionViewModel
+            var viewModel = new QuestionViewModel
             {
-                Options = new List<QuestionModel.ViewModels.OptionViewModel>
+                Options = new List<OptionViewModel>
         {
-            new QuestionModel.ViewModels.OptionViewModel { Value = "A" },
-            new QuestionModel.ViewModels.OptionViewModel { Value = "B" },
-            new QuestionModel.ViewModels.OptionViewModel { Value = "C" },
-            new QuestionModel.ViewModels.OptionViewModel { Value = "D" }
+            new OptionViewModel(),
+            new OptionViewModel(),
+            new OptionViewModel(),
+            new OptionViewModel()
         }
             };
 
             return View(viewModel);
         }
 
+
         // POST: Teacher/AddQuestion
         [HttpPost]
-        public IActionResult AddQuestion(QuestionViewModel model)
+        public async Task<IActionResult> AddQuestion(QuestionViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -65,15 +66,14 @@ namespace Quiz.Controllers
                 {
                     Text = model.Text,
                     Points = model.Points,
-                    Options = model.Options?.Select((option, index) => new Option
+                    Options = model.Options.Select(o => new Option
                     {
-                        Text = option.Text,
-                        Value = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index].ToString()
-                    }).ToList(),
-                    CorrectAnswer = model.CorrectAnswer // This should match the selected value
+                        Text = o.Text,
+                        IsCorrect = o.IsCorrect
+                    }).ToList()
                 };
 
-                _questionService.AddQuestion(question);
+                await _questionService.AddQuestionAsync(question);
                 return RedirectToAction("Index");
             }
 
@@ -83,6 +83,7 @@ namespace Quiz.Controllers
 
 
         // GET: Teacher/EditQuestion/5
+        [HttpGet("EditQuestion/{id}")]
         public IActionResult EditQuestion(int id)
         {
             var question = _questionService.GetQuestionById(id);
@@ -96,12 +97,11 @@ namespace Quiz.Controllers
             {
                 Id = question.Id,
                 Text = question.Text,
-                CorrectAnswer = question.CorrectAnswer,
                 Points = question.Points,
                 Options = question.Options?.Select(o => new QuestionModel.ViewModels.OptionViewModel
                 {
                     Text = o.Text,
-                    Value = o.Value
+                    IsCorrect = o.IsCorrect
                 }).ToList()
             };
 
@@ -109,7 +109,7 @@ namespace Quiz.Controllers
         }
 
         // POST: Teacher/EditQuestion/5
-        [HttpPost]
+        [HttpPost("EditQuestion/{id}")]
         public IActionResult EditQuestion(int id, QuestionViewModel model)
         {
             if (ModelState.IsValid)
@@ -118,23 +118,19 @@ namespace Quiz.Controllers
                 {
                     Id = id,
                     Text = model.Text,
-                    CorrectAnswer = model.CorrectAnswer,
                     Points = model.Points,
                     Options = model.Options?.Select(o => new Option
                     {
                         Text = o.Text,
-                        Value = o.Value
+                        IsCorrect = o.IsCorrect
                     }).ToList()
                 };
 
                 _questionService.UpdateQuestion(question);
-
-                return RedirectToAction("Index");
+                return RedirectToAction("Questions");
             }
 
             return View(model);
         }
-
-
     }
 }

@@ -16,8 +16,10 @@
 
     public class OptionViewModel
     {
-        public string? Value { get; set; }
-        public string? Text { get; set; }
+        public string? Value { get; set; } // Maps to OptionText
+        public string? Text { get; set; } // Maps to OptionText
+
+        public bool IsCorrect { get; set; }  // Indicates if this option is correct
     }
 
 }

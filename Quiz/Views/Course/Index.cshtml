@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Lesson.Models.Subject>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>Courses</h2>
+
+        <div class="row">
+            @foreach (var course in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="background-color:@course.BackgroundColor;">
+                        <img src="@course.IconUrl" class="card-img-top" alt="@course.Title" />
+                        <div class="card-body">
+                            <h5 class="card-title">@course.Title</h5>
+                            <p class="card-text">Code: @course.Code</p>
+                            <p class="card-text">Course Professor: @course.CourseProfessor</p>
+                            <p class="card-text">Seminar Professor: @course.SeminarProfessor</p>
+                            <a href="@Url.Action("Details", "Course", new { id = course.Id })" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

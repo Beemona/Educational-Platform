@@ -1,0 +1,41 @@
+﻿@model Quiz.Models.SelectedQuestionsViewModel
+
+@{
+    ViewData["Title"] = "Selected Questions";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="SaveQuestions" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question Text</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@Model.Questions[i].Text</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-question-index="@i" onclick="handleEdit(@i)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+</form>
+
+<script>
+    function handleEdit(index) {
+        // Logic to handle editing a question, e.g., opening a modal or redirecting
+    }
+</script>

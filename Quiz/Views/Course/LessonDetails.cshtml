@@ -1,0 +1,90 @@
+﻿@model Lesson.Models.LessonPreview
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>@Model.LessonTitle</h2>
+
+        <!-- Lesson Details -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Professor: @Model.ProfessorName</h5>
+                <div class="card-text">
+                    <p>@Model.LessonText</p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-4">
+                    <button class="btn btn-primary" onclick="textToSpeech()">Text to Speech</button>
+                    @if (!ViewBag.IsLessonFinished)
+                    {
+                        <button class="btn btn-success" onclick="finishLesson()">Finish Lesson</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-success" disabled>Lesson Finished</button>
+                    }
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="mt-4">
+                    @if (ViewBag.PreviousLessonId != null)
+                    {
+                        <a href="@Url.Action("LessonDetails", "Course", new { lessonId = ViewBag.PreviousLessonId })" class="btn btn-secondary">Previous</a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary" disabled>Previous</button>
+                    }
+
+                    @if (ViewBag.IsLessonFinished && ViewBag.NextLessonId != null)
+                    {
+                        <a href="@Url.Action("LessonDetails", "Course", new { lessonId = ViewBag.NextLessonId })" class="btn btn-secondary">Next</a>
+                    }
+                    else if (!ViewBag.IsLessonFinished)
+                    {
+                        <button class="btn btn-secondary" disabled>Next</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function textToSpeech() {
+            var text = '@Model.LessonText'.replace(/(\r\n|\n|\r)/gm, " ");
+            var speech = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(speech);
+        }
+
+        function finishLesson() {
+            var lessonId = '@Model.Id';
+
+            // Make an AJAX request to finish the lesson
+            fetch('/Course/FinishLesson', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lessonId: lessonId })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to update the button states
+                        location.reload();
+                    } else {
+                        alert('Failed to finish the lesson');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred');
+                });
+        }
+    </script>
+</body>
+</html>

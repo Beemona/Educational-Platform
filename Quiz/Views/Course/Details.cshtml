@@ -1,0 +1,70 @@
+﻿@model Lesson.Models.Subject
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>@Model.Title Details</h2>
+
+        <!-- Existing Course Details -->
+        <div class="card mb-3" style="background-color:@Model.BackgroundColor;">
+            <div class="card-body">
+                <img src="@Model.IconUrl" alt="@Model.Title" class="card-img-top" />
+                <h5 class="card-title">@Model.Title</h5>
+                <p class="card-text">Code: @Model.Code</p>
+                <p class="card-text">Course Professor: @Model.CourseProfessor</p>
+                <p class="card-text">Seminar Professor: @Model.SeminarProfessor</p>
+            </div>
+        </div>
+
+        <!-- Course Card -->
+        @if (Model.CourseCard != null)
+        {
+            <div class="card mb-3" style="background-color:#D1E7DD;">
+                <div class="card-body">
+                    <h5 class="card-title">Course Card</h5>
+                    <p class="card-text">Title: @Model.CourseCard.Title</p>
+                    <p class="card-text">Professor: @Model.CourseCard.Professor</p>
+                    <p class="card-text">Lessons Posted: @Model.CourseCard.NumberOfLessonsPosted</p>
+                    <p class="card-text">Weeks Passed: @Model.CourseCard.WeeksPassed</p>
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id })" class="btn btn-primary">View Course Lessons</a>
+                </div>
+            </div>
+        }
+
+        <!-- Seminar Card -->
+        @if (Model.SeminarCard != null)
+        {
+            <div class="card mb-3" style="background-color:#CFE2F3;">
+                <div class="card-body">
+                    <h5 class="card-title">Seminar Card</h5>
+                    <p class="card-text">Title: @Model.SeminarCard.Title</p>
+                    <p class="card-text">Professor: @Model.SeminarCard.Professor</p>
+                    <p class="card-text">Lessons Posted: @Model.SeminarCard.NumberOfLessonsPosted</p>
+                    <p class="card-text">Weeks Passed: @Model.SeminarCard.WeeksPassed</p>
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id })" class="btn btn-primary">View Seminar Lessons</a>
+                </div>
+            </div>
+        }
+
+        <!-- Final Exam Card -->
+        @if (Model.FinalExam != null)
+        {
+            <div class="card mb-3" style="background-color:#F9CB9C;">
+                <div class="card-body">
+                    <h5 class="card-title">Final Exam</h5>
+                    <p class="card-text">Exam Name: @Model.FinalExam.ExamName</p>
+                    <p class="card-text">Number of Questions: @Model.FinalExam.NumberOfQuestions</p>
+                    <p class="card-text">Total Points: @Model.FinalExam.TotalPoints</p>
+                    <!-- Redirect to Quiz/Index page -->
+                    <a href="@Url.Action("Index", "Quiz")" class="btn btn-primary">Take Final Exam</a>
+                </div>
+            </div>
+        }
+
+    </div>
+</body>
+</html>

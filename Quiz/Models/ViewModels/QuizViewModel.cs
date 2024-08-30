@@ -1,4 +1,6 @@
-﻿namespace Quiz.Models
+﻿using QuestionModel.Models;
+
+namespace Quiz.Models
 {
     public class QuizViewModel
     {
@@ -22,4 +24,21 @@
         public bool IsCorrect { get; set; }  // Indicates if this option is correct
     }
 
+    public class QuizCreationViewModel
+    {
+        public string? SelectedFormat { get; set; } // Quiz format
+        public int NumberOfQuestions { get; set; } // Number of questions
+        public bool IsRandomized { get; set; } // Randomized or handpicked
+        public Dictionary<string, int>? SubjectTables { get; set; } // Tables and number of questions from each table
+    }
+    public class Test
+    {
+        public int Id { get; set; }
+        public List<Question>? Questions { get; set; }
+    }
+
+    public class SelectedQuestionsViewModel
+    {
+        public List<Question>? Questions { get; set; }
+    }
 }

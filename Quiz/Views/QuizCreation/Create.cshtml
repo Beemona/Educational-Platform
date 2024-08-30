@@ -1,0 +1,40 @@
+﻿@model Quiz.Models.QuizCreationViewModel
+
+<h2>Create Quiz</h2>
+
+<form asp-controller="QuizCreation" asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="SelectedFormat">Select Quiz Format</label>
+        <select id="SelectedFormat" name="SelectedFormat" class="form-control">
+            <option value="SingleAnswer">Single Answer</option>
+            <option value="MultipleAnswers">Multiple Answers</option>
+            <option value="OpenQuestion">Open Question</option>
+            <option value="Report">Report</option>
+            <option value="AddValue">Add Value</option>
+            <option value="Mixed">Mixed</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="NumberOfQuestions">Number of Questions</label>
+        <input type="number" id="NumberOfQuestions" name="NumberOfQuestions" class="form-control" />
+    </div>
+
+    <div class="form-check">
+        <input type="checkbox" id="IsRandomized" name="IsRandomized" class="form-check-input" />
+        <label class="form-check-label" for="IsRandomized">Randomize Questions</label>
+    </div>
+
+    <div class="form-group">
+        <h3>Select Questions</h3>
+        @foreach (var table in Model.SubjectTables)
+        {
+            <div>
+                <label>@table.Key</label>
+                <input type="number" name="SubjectTables[@table.Key]" value="0" min="0" class="form-control" placeholder="Number of questions from @table.Key" />
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Quiz</button>
+</form>

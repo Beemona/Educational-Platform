@@ -1,0 +1,31 @@
+﻿@model Lesson.Models.Subject
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>@Model.Title Lessons</h2>
+        <!-- Lesson Cards -->
+        <div class="row">
+            @foreach (var lesson in Model.Lessons)
+            {
+                <div class="col-md-4 mb-3">
+                    <a href="@Url.Action("LessonDetails", "Course", new { lessonId = lesson.Id })" class="card" style="background-color:#E1E8ED; text-decoration:none;">
+                        <div class="card-body">
+                            <h5 class="card-title">@lesson.LessonName</h5>
+                            <p class="card-text">Title: @lesson.LessonTitle</p>
+                            <p class="card-text">Week: @lesson.WeekNumber</p>
+                            <p class="card-text">Date: @lesson.DateRange</p>
+                            <p class="card-text">Year: @lesson.Year</p>
+                            <p class="card-text">Summary: @lesson.Summary</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

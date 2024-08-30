@@ -48,4 +48,15 @@ app.MapControllerRoute(
     pattern: "Quiz/{action=Index}/{id?}",
     defaults: new { controller = "Quiz" });
 
+app.MapControllerRoute(
+    name: "quizcreation",
+    pattern: "QuizCreation/{action=Create}/{id?}",
+    defaults: new { controller = "QuizCreation" });
+
+app.MapControllerRoute(
+    name: "courses",
+    pattern: "Course/{action=Course}/{id?}",
+    defaults: new { controller = "Course" });
+
+
 app.Run();

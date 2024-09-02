@@ -30,7 +30,7 @@
                     <p class="card-text">Professor: @Model.CourseCard.Professor</p>
                     <p class="card-text">Lessons Posted: @Model.CourseCard.NumberOfLessonsPosted</p>
                     <p class="card-text">Weeks Passed: @Model.CourseCard.WeeksPassed</p>
-                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id })" class="btn btn-primary">View Course Lessons</a>
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = false })" class="btn btn-primary">View Course Lessons</a>
                 </div>
             </div>
         }
@@ -45,10 +45,11 @@
                     <p class="card-text">Professor: @Model.SeminarCard.Professor</p>
                     <p class="card-text">Lessons Posted: @Model.SeminarCard.NumberOfLessonsPosted</p>
                     <p class="card-text">Weeks Passed: @Model.SeminarCard.WeeksPassed</p>
-                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id })" class="btn btn-primary">View Seminar Lessons</a>
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = true })" class="btn btn-primary">View Seminar Lessons</a>
                 </div>
             </div>
         }
+
 
         <!-- Final Exam Card -->
         @if (Model.FinalExam != null)
@@ -59,12 +60,10 @@
                     <p class="card-text">Exam Name: @Model.FinalExam.ExamName</p>
                     <p class="card-text">Number of Questions: @Model.FinalExam.NumberOfQuestions</p>
                     <p class="card-text">Total Points: @Model.FinalExam.TotalPoints</p>
-                    <!-- Redirect to Quiz/Index page -->
                     <a href="@Url.Action("Index", "Quiz")" class="btn btn-primary">Take Final Exam</a>
                 </div>
             </div>
         }
-
     </div>
 </body>
 </html>

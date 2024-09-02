@@ -20,6 +20,8 @@ namespace QuizDbContext.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<ClassCard> ClassCards { get; set; }
         public DbSet<LessonCard> LessonCards { get; set; }
+        public DbSet<ClassCard> CourseCards { get; set; }
+        public DbSet<ClassCard> SeminarCards { get; set; }
         public DbSet<FinalExamCard> FinalExamCards { get; set; }
         public DbSet<LessonPreview> LessonPreviews { get; set; }
         public DbSet<LessonProgress> LessonProgresses { get; set; }
@@ -84,6 +86,26 @@ namespace QuizDbContext.Data
                 .WithOne(lc => lc.Subject)
                 .HasForeignKey(lc => lc.SubjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LessonCard>()
+                .HasOne(l => l.Subject)
+                .WithMany(s => s.Lessons)
+                .HasForeignKey(l => l.SubjectId);
+
+            modelBuilder.Entity<LessonCard>()
+                .HasOne<ClassCard>()
+                .WithMany()
+                .HasForeignKey(l => l.CourseCardId);
+
+            modelBuilder.Entity<LessonCard>()
+                .HasOne<ClassCard>()
+                .WithMany()
+                .HasForeignKey(l => l.SeminarCardId);
+
+            modelBuilder.Entity<FinalExamCard>()
+                .HasOne(s => s.Subject)
+                .WithMany()
+                .HasForeignKey(s => s.SubjectId);
 
             // Primary Key Configuration
             modelBuilder.Entity<Question>()

@@ -1,0 +1,33 @@
+﻿@model Lesson.Models.LessonPreview
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Lesson</h2>
+
+        @using (Html.BeginForm("EditLesson", "Course", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LessonTitle)
+                @Html.EditorFor(model => model.LessonTitle)
+                @Html.ValidationMessageFor(model => model.LessonTitle)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LessonText)
+                @Html.TextAreaFor(model => model.LessonText)
+                @Html.ValidationMessageFor(model => model.LessonText)
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+        }
+    </div>
+</body>
+</html>

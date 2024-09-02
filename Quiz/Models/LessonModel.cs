@@ -56,7 +56,10 @@ namespace Lesson.Models
             public int SubjectId { get; set; }
             public Subject? Subject { get; set; }
 
-        }
+            public int? CourseCardId { get; set; } // This should be included if lessons are tied to course cards
+            public int? SeminarCardId { get; set; } // This should be included if lessons are tied to seminar cards
+
+    }
 
         public class FinalExamCard
         {

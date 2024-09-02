@@ -29,14 +29,13 @@ namespace Quiz.Controllers
         }
 
         // Action to display details of a specific course
-        // Action to display details of a specific course
         public async Task<IActionResult> Details(int id)
         {
             var course = await _context.Subjects
                 .Include(s => s.CourseCard)
                 .Include(s => s.SeminarCard)
                 .Include(s => s.Lessons)
-                .Include(s => s.FinalExam) // Include FinalExamCard
+                .Include(s => s.FinalExam)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (course == null)
@@ -47,15 +46,15 @@ namespace Quiz.Controllers
             return View(course); // Return the single course to the view
         }
 
-
-
-
+        // Action to display lessons for a specific course or seminar
         // Action to display lessons and final exam details for a specific course
-        public async Task<IActionResult> CourseLessons(int id)
+        public async Task<IActionResult> CourseLessons(int id, bool isSeminar = false)
         {
             // Fetch the subject along with its lessons
             var subject = await _context.Subjects
                 .Include(s => s.Lessons)
+                .Include(s => s.CourseCard)
+                .Include(s => s.SeminarCard)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (subject == null)
@@ -63,19 +62,21 @@ namespace Quiz.Controllers
                 return NotFound(); // Return 404 if the subject is not found
             }
 
-            // Check if we have a valid CourseCard or SeminarCard
-            if (subject.CourseCardId != null)
-            {
-                // Logic for course lessons if needed
-            }
+            // Filter lessons based on whether it is a course or seminar
+            var filteredLessons = subject.Lessons.Where(lesson =>
+                (isSeminar && lesson.SeminarCardId == subject.SeminarCardId) ||
+                (!isSeminar && lesson.CourseCardId == subject.CourseCardId)
+            ).ToList();
 
-            if (subject.SeminarCardId != null)
+            var viewModel = new CourseLessonsViewModel
             {
-                // Logic for seminar lessons if needed
-            }
+                Subject = subject,
+                Lessons = filteredLessons
+            };
 
-            return View(subject); // Return the subject to the view
+            return View(viewModel);
         }
+
 
 
         // Action to display details of a specific lesson
@@ -99,6 +100,7 @@ namespace Quiz.Controllers
 
             return View(lessonDetails);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> FinishLesson(int lessonId)
@@ -125,6 +127,72 @@ namespace Quiz.Controllers
 
             // Redirect to the lesson details page to refresh state
             return RedirectToAction("LessonDetails", new { lessonId });
+        }
+
+        // GET: Course/EditLesson/1
+        public async Task<IActionResult> EditLesson(int id)
+        {
+            var lesson = await _context.LessonPreviews.FindAsync(id);
+            if (lesson == null)
+            {
+                return NotFound(); // Return 404 if the lesson is not found
+            }
+            return View("EditLesson", lesson); // Return the view with the lesson
+        }
+
+
+        // POST: Course/EditLesson/1
+        [HttpPost]
+        public async Task<IActionResult> EditLesson(int id, LessonPreview lesson)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(lesson); // Return the view with validation errors
+            }
+
+            try
+            {
+                // Fetch the existing lesson from the database
+                var existingLesson = await _context.LessonPreviews.FindAsync(id);
+                if (existingLesson == null)
+                {
+                    return NotFound(); // Return 404 if the lesson is not found
+                }
+
+                // Update the lesson's properties
+                existingLesson.LessonTitle = lesson.LessonTitle;
+                existingLesson.LessonText = lesson.LessonText;
+                existingLesson.SubjectId = lesson.SubjectId; // Ensure this is a valid ID
+
+                // Validate the SubjectId
+                var subjectExists = await _context.Subjects.AnyAsync(s => s.Id == lesson.SubjectId);
+                if (!subjectExists)
+                {
+                    ModelState.AddModelError("", "Invalid SubjectId.");
+                    return View(lesson); // Return view with error
+                }
+
+                // Mark the entity as modified
+                _context.Entry(existingLesson).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync(); // Save changes
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception and provide meaningful feedback
+                Console.WriteLine($"Error: {ex.InnerException?.Message}");
+                ModelState.AddModelError("", "Unable to save changes. Try again later.");
+                return View(lesson); // Return view with error
+            }
+
+            return RedirectToAction("LessonDetails", new { id = id }); // Redirect to the lesson details page
+        }
+
+
+
+        private bool LessonExists(int id)
+        {
+            return _context.LessonPreviews.Any(e => e.Id == id);
         }
     }
 }

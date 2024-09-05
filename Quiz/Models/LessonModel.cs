@@ -1,6 +1,7 @@
 ﻿// Models/CourseModel.cs
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Authentication.Models;
 
 namespace Lesson.Models
 {
@@ -23,8 +24,14 @@ namespace Lesson.Models
 
         public int? FinalExamCardId { get; set; }
         public FinalExamCard? FinalExam { get; set; }
+        public int? FacultyId { get; set; }
+        public Faculty? Faculty { get; set; }
 
         public ICollection<LessonCard>? Lessons { get; set; }
+        // Students and Teachers associated with the subject
+        public ICollection<User>? Students { get; set; } = new List<Authentication.Models.User>();
+        public ICollection<User>? Teachers { get; set; } = new List<Authentication.Models.User>();
+        public ICollection<Specialization>? Specializations { get; set; } // Subjects associated with specializations
     }
 
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuizDbContext.Data;
 
@@ -11,9 +12,11 @@ using QuizDbContext.Data;
 namespace Quiz.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240904204846_Specialization")]
+    partial class Specialization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,10 +81,6 @@ namespace Quiz.Migrations
 
                     b.Property<bool?>("IsAdmin")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -276,9 +275,6 @@ namespace Quiz.Migrations
                     b.Property<string>("CourseProfessor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FacultyId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("FinalExamCardId")
                         .HasColumnType("int");
 
@@ -297,8 +293,6 @@ namespace Quiz.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseCardId");
-
-                    b.HasIndex("FacultyId");
 
                     b.HasIndex("FinalExamCardId");
 
@@ -383,21 +377,6 @@ namespace Quiz.Migrations
                     b.ToTable("QuestionResults");
                 });
 
-            modelBuilder.Entity("SpecializationSubjects", b =>
-                {
-                    b.Property<int>("SpecializationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SpecializationId", "SubjectId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("SpecializationSubjects");
-                });
-
             modelBuilder.Entity("StudentModel.Models.StudentResult", b =>
                 {
                     b.Property<int>("Id")
@@ -453,9 +432,9 @@ namespace Quiz.Migrations
             modelBuilder.Entity("Authentication.Models.Specialization", b =>
                 {
                     b.HasOne("Authentication.Models.Faculty", "Faculty")
-                        .WithMany("Specializations")
+                        .WithMany()
                         .HasForeignKey("FacultyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Faculty");
                 });
@@ -526,11 +505,6 @@ namespace Quiz.Migrations
                         .HasForeignKey("CourseCardId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Authentication.Models.Faculty", "Faculty")
-                        .WithMany()
-                        .HasForeignKey("FacultyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Lesson.Models.FinalExamCard", "FinalExam")
                         .WithMany()
                         .HasForeignKey("FinalExamCardId")
@@ -542,8 +516,6 @@ namespace Quiz.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CourseCard");
-
-                    b.Navigation("Faculty");
 
                     b.Navigation("FinalExam");
 
@@ -570,21 +542,6 @@ namespace Quiz.Migrations
                         .IsRequired();
 
                     b.Navigation("StudentResult");
-                });
-
-            modelBuilder.Entity("SpecializationSubjects", b =>
-                {
-                    b.HasOne("Authentication.Models.Specialization", null)
-                        .WithMany()
-                        .HasForeignKey("SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Lesson.Models.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("StudentSubjects", b =>
@@ -619,8 +576,6 @@ namespace Quiz.Migrations
 
             modelBuilder.Entity("Authentication.Models.Faculty", b =>
                 {
-                    b.Navigation("Specializations");
-
                     b.Navigation("Users");
                 });
 

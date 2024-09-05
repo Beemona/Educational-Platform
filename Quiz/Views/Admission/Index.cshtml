@@ -1,0 +1,317 @@
+﻿@model Admission.Model.AdmissionViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .stepper-container {
+            width: 100%;
+            margin: auto;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+            .stepper .step {
+                flex: 1;
+                text-align: center;
+                position: relative;
+            }
+
+        .step.active .step-number {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .step .step-number {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            border: 2px solid #007bff;
+            display: inline-block;
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
+            background-color: #fff;
+        }
+
+        .step .step-title {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+            .step-content.active {
+                display: block;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Student Admission</h2>
+        <h4>Admission year: 2024</h4>
+
+        <div class="stepper-container">
+            <!-- Stepper -->
+            <div class="stepper">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Select Program</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Exam Type</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Student Information</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Program Selection -->
+            <div id="step1" class="step-content active">
+                <form id="admissionForm" method="post">
+                    <div class="form-group">
+                        <label for="SelectedFaculty">Select Faculty</label>
+                        <select id="SelectedFaculty" name="SelectedFaculty" class="form-control">
+                            <option value="">--Select Faculty--</option>
+                            @foreach (var faculty in Model.Faculties)
+                            {
+                                <option value="@faculty">@faculty</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="SelectedDegree">Select Degree</label>
+                        <select id="SelectedDegree" name="SelectedDegree" class="form-control">
+                            <option value="">--Select Degree--</option>
+                            @foreach (var degree in Model.Degrees)
+                            {
+                                <option value="@degree">@degree</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="SelectedProgram">Select Program</label>
+                        <select id="SelectedProgram" name="SelectedProgram" class="form-control">
+                            <option value="">--Select Program--</option>
+                            @foreach (var program in Model.Programs)
+                            {
+                                <option value="@program">@program</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type of Learning</label>
+                        <select id="LearningType" name="LearningType" class="form-control">
+                            @foreach (var type in Model.LearningTypes)
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Application Type</label>
+                        <select id="ApplicationType" name="ApplicationType" class="form-control">
+                            @foreach (var type in Model.ApplicationTypes)
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                </form>
+            </div>
+
+            <!-- Step 2: Exam Type -->
+            <div id="step2" class="step-content">
+                <h4>Exam Type</h4>
+                <div class="form-check">
+                    <input type="radio" id="OnlineExam" name="ExamType" value="Online" class="form-check-input" />
+                    <label class="form-check-label" for="OnlineExam">Online Exam</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" id="PaperExam" name="ExamType" value="Paper" class="form-check-input" />
+                    <label class="form-check-label" for="PaperExam">Paper Exam</label>
+                </div>
+
+                <div id="ExamDetails" class="form-group mt-3" style="display: none;">
+                    <h4 id="ExamTitle"></h4>
+                    <p>Number of Questions: <span id="NumberOfQuestions"></span></p>
+                    <p>Points per Question: <span id="PointsPerQuestion"></span></p>
+                    <p>Points Required to Pass: <span id="PointsRequired"></span></p>
+                    <p>Duration: <span id="Duration"></span></p>
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="prevStep()">Previous</button>
+                <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+            </div>
+
+            <!-- Step 3: Student Information -->
+            <div id="step3" class="step-content">
+                <h2>Student Information</h2>
+
+                <form asp-action="SubmitStudentInformation" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="FirstName">First Name</label>
+                        <input type="text" id="FirstName" name="FirstName" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="FathersInitial">Father's Initial</label>
+                        <input type="text" id="FathersInitial" name="FathersInitial" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="LastName">Last Name</label>
+                        <input type="text" id="LastName" name="LastName" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="CNP">CNP</label>
+                        <input type="text" id="CNP" name="CNP" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Email">E-mail</label>
+                        <input type="email" id="Email" name="Email" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="PhoneNumber">Phone Number</label>
+                        <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Photo">Upload a Photo</label>
+                        <input type="file" id="Photo" name="Photo" class="form-control-file" />
+                    </div>
+
+                    <div id="additionalRequirements">
+                        <!-- Additional requirements will be injected here by JavaScript -->
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function nextStep() {
+            var currentStep = document.querySelector('.step-content.active');
+            var nextStep = currentStep.nextElementSibling;
+
+            if (nextStep) {
+                currentStep.classList.remove('active');
+                nextStep.classList.add('active');
+
+                updateStepper();
+            }
+        }
+
+        function prevStep() {
+            var currentStep = document.querySelector('.step-content.active');
+            var prevStep = currentStep.previousElementSibling;
+
+            if (prevStep) {
+                currentStep.classList.remove('active');
+                prevStep.classList.add('active');
+
+                updateStepper();
+            }
+        }
+
+        function updateStepper() {
+            var steps = document.querySelectorAll('.step');
+            var activeStepIndex = Array.from(document.querySelectorAll('.step-content')).indexOf(document.querySelector('.step-content.active'));
+
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === activeStepIndex);
+            });
+        }
+
+        $(document).ready(function () {
+            $('input[name="ExamType"]').change(function () {
+                var examType = $(this).val();
+                var examDetails = $('#ExamDetails');
+                var examTitle = $('#ExamTitle');
+                var numberOfQuestions = $('#NumberOfQuestions');
+                var pointsPerQuestion = $('#PointsPerQuestion');
+                var pointsRequired = $('#PointsRequired');
+                var duration = $('#Duration');
+
+                if (examType === "Online") {
+                    examTitle.text("Online Quiz");
+                    numberOfQuestions.text("50");
+                    pointsPerQuestion.text("2");
+                    pointsRequired.text("80");
+                    duration.text("30 minutes");
+                } else if (examType === "Paper") {
+                    examTitle.text("Paper Exam");
+                    numberOfQuestions.text("50");
+                    pointsPerQuestion.text("1");
+                    pointsRequired.text("40");
+                    duration.text("1 hour");
+                }
+
+                examDetails.show();
+            });
+
+            $('#SelectedDegree').change(function () {
+                var degree = $(this).val();
+                var additionalRequirements = $('#additionalRequirements');
+                additionalRequirements.empty(); // Clear previous content
+
+                if (degree === "Bachelor") {
+                    additionalRequirements.append(`
+                                <div class="form-check">
+                                    <input type="checkbox" id="FinishedSAT" name="FinishedSAT" class="form-check-input" />
+                                    <label class="form-check-label" for="FinishedSAT">I have finished my SATs</label>
+                                </div>
+                                <div class="form-group mt-3">
+                                    <label for="SATDiploma">Upload SAT Diploma</label>
+                                    <input type="file" id="SATDiploma" name="SATDiploma" class="form-control-file" />
+                                </div>
+                            `);
+                } else if (degree === "Master") {
+                    additionalRequirements.append(`
+                                <div class="form-check">
+                                    <input type="checkbox" id="FinishedBachelors" name="FinishedBachelors" class="form-check-input" />
+                                    <label class="form-check-label" for="FinishedBachelors">I have finished my Bachelor's</label>
+                                </div>
+                                <div class="form-group mt-3">
+                                    <label for="BachelorsDiploma">Upload Bachelor's Diploma</label>
+                                    <input type="file" id="BachelorsDiploma" name="BachelorsDiploma" class="form-control-file" />
+                                </div>
+                            `);
+                } else {
+                    additionalRequirements.append(`
+                                <div class="form-group mt-3">
+                                    <label for="ProofFutureCompletion">Upload Proof of Future Completion</label>
+                                    <input type="file" id="ProofFutureCompletion" name="ProofFutureCompletion" class="form-control-file" />
+                                </div>
+                            `);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

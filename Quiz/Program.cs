@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QuizDbContext.Data;
 using QuizDbContext.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,8 +27,8 @@ builder.Services.AddSession(options =>
 });
 
 // Add authentication and authorization
-builder.Services.AddAuthentication("YourAuthScheme")
-    .AddCookie("YourAuthScheme", options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
@@ -46,38 +47,34 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+// Configure routes
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-    endpoints.MapControllerRoute(
-        name: "quiz",
-        pattern: "Quiz/{action=Index}/{id?}",
-        defaults: new { controller = "Quiz" });
+app.MapControllerRoute(
+    name: "quiz",
+    pattern: "Quiz/{action=Index}/{id?}",
+    defaults: new { controller = "Quiz" });
 
-    endpoints.MapControllerRoute(
-        name: "quizcreation",
-        pattern: "QuizCreation/{action=Create}/{id?}",
-        defaults: new { controller = "QuizCreation" });
+app.MapControllerRoute(
+    name: "quizcreation",
+    pattern: "QuizCreation/{action=Create}/{id?}",
+    defaults: new { controller = "QuizCreation" });
 
-    endpoints.MapControllerRoute(
-        name: "courses",
-        pattern: "Course/{action=Course}/{id?}",
-        defaults: new { controller = "Course" });
+app.MapControllerRoute(
+    name: "courses",
+    pattern: "Course/{action=Course}/{id?}",
+    defaults: new { controller = "Course" });
 
-    endpoints.MapControllerRoute(
-        name: "admissions",
-        pattern: "Admission/{action=Index}/{id?}",
-        defaults: new { controller = "Admission" });
-});
+app.MapControllerRoute(
+    name: "admissions",
+    pattern: "Admission/{action=Index}/{id?}",
+    defaults: new { controller = "Admission" });
 
 app.Run();

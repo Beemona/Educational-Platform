@@ -28,9 +28,10 @@ namespace Lesson.Models
         public Faculty? Faculty { get; set; }
 
         public ICollection<LessonCard>? Lessons { get; set; }
+
         // Students and Teachers associated with the subject
-        public ICollection<User>? Students { get; set; } = new List<Authentication.Models.User>();
-        public ICollection<User>? Teachers { get; set; } = new List<Authentication.Models.User>();
+        public ICollection<Student>? Students { get; set; } = new List<Student>();
+        public ICollection<Teacher>? Teachers { get; set; } = new List<Teacher>();
         public ICollection<Specialization>? Specializations { get; set; } // Subjects associated with specializations
     }
 

@@ -29,6 +29,8 @@ namespace QuizDbContext.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
         public DbSet<Specialization> Specializations { get; set; }
+        public DbSet<EducationType> EducationTypes { get; set; }
+        public DbSet<Department> Departments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -91,22 +93,76 @@ namespace QuizDbContext.Data
                 .HasForeignKey(lc => lc.SubjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Add the Specialization relationships
+            // Specialization and Faculty
             modelBuilder.Entity<Specialization>()
                 .HasOne(s => s.Faculty)
-                .WithMany()
+                .WithMany(f => f.Specializations)
                 .HasForeignKey(s => s.FacultyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Existing relationships for Users and Subjects
+            // Specialization and EducationType
+            modelBuilder.Entity<Specialization>()
+               .HasOne(s => s.EducationType)
+               .WithMany(e => e.Specializations)
+               .HasForeignKey(s => s.EducationTypeId)
+               .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<User>()
-                .HasMany(u => u.AccessibleSubjects)
-                .WithMany(s => s.Students)
+                .HasDiscriminator<string>("Discriminator")
+                .HasValue<Student>("Student")
+                .HasValue<Teacher>("Teacher")
+                .HasValue<Admin>("Admin");
+
+
+            // SpecializationSubjects
+            modelBuilder.Entity<Specialization>()
+            .HasMany(s => s.Subjects)
+            .WithMany(sub => sub.Specializations)
+            .UsingEntity<Dictionary<string, object>>(
+                "SpecializationSubjects",
+                j => j.HasOne<Subject>().WithMany().HasForeignKey("SubjectId"),
+                j => j.HasOne<Specialization>().WithMany().HasForeignKey("SpecializationId")
+            );
+
+            // Specialization and Student
+            modelBuilder.Entity<Student>()
+               .HasOne(s => s.Specialization)
+               .WithMany(s => s.Students)
+               .HasForeignKey(s => s.SpecializationId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuring the relationship between Student and EducationType
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.EducationType)
+                .WithMany(e => e.Students)
+                .HasForeignKey(s => s.EducationTypeId)
+                .OnDelete(DeleteBehavior.Restrict); // Change to Restrict to avoid cascade issues
+
+            // Configuring the relationship between Student and Faculty
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Faculty)
+                .WithMany(f => f.Students)
+                .HasForeignKey(s => s.FacultyId)
+                .OnDelete(DeleteBehavior.Restrict); // Change to Restrict to avoid cascade issues
+
+            // Teacher and Department
+            modelBuilder.Entity<Teacher>()
+                .HasOne(t => t.Department)
+                .WithMany(d => d.Teachers)
+                .HasForeignKey(t => t.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // Student and Subjects relationship
+            modelBuilder.Entity<Student>()
+                .HasMany(s => s.AccessibleSubjects)
+                .WithMany(sub => sub.Students)
                 .UsingEntity<Dictionary<string, object>>(
                     "StudentSubjects",
                     j => j.HasOne<Subject>().WithMany().HasForeignKey("SubjectId"),
-                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
-                );
+                    j => j.HasOne<Student>().WithMany().HasForeignKey("StudentId")
+            );
+
             modelBuilder.Entity<Subject>()
                 .HasOne(s => s.Faculty)
                 .WithMany()
@@ -124,24 +180,42 @@ namespace QuizDbContext.Data
                 .HasForeignKey(s => s.FacultyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Specialization and Subject Relationship
-            modelBuilder.Entity<Specialization>()
-                .HasMany(s => s.Subjects)
-                .WithMany(sub => sub.Specializations)
+            // Teacher and Specializations
+            modelBuilder.Entity<Teacher>()
+                .HasMany(t => t.Specializations)
+                .WithMany(s => s.Teachers)
                 .UsingEntity<Dictionary<string, object>>(
-                    "SpecializationSubjects",
-                    j => j.HasOne<Subject>().WithMany().HasForeignKey("SubjectId"),
-                    j => j.HasOne<Specialization>().WithMany().HasForeignKey("SpecializationId")
+                    "TeacherSpecializations",
+                    j => j.HasOne<Specialization>().WithMany().HasForeignKey("SpecializationId"),
+                    j => j.HasOne<Teacher>().WithMany().HasForeignKey("TeacherId")
                 );
 
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.TaughtSubjects)
-                .WithMany(s => s.Teachers)
+            // Teacher and TaughtSubjects Relationship
+            modelBuilder.Entity<Teacher>()
+                .HasMany(t => t.TaughtSubjects)
+                .WithMany(sub => sub.Teachers)
                 .UsingEntity<Dictionary<string, object>>(
                     "TeacherSubjects",
                     j => j.HasOne<Subject>().WithMany().HasForeignKey("SubjectId"),
-                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
+                    j => j.HasOne<Teacher>().WithMany().HasForeignKey("TeacherId")
                 );
+
+            // Configuring the relationship between Teacher and Faculty
+            modelBuilder.Entity<Teacher>()
+                .HasMany(t => t.Faculties)
+                .WithMany(f => f.Teachers)
+                .UsingEntity<Dictionary<string, object>>(
+                    "TeacherFaculty",
+                    j => j
+                        .HasOne<Faculty>()
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Restrict),
+                    j => j
+                        .HasOne<Teacher>()
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict));
 
             modelBuilder.Entity<LessonCard>()
                 .HasOne(l => l.Subject)
@@ -196,6 +270,9 @@ namespace QuizDbContext.Data
 
             modelBuilder.Entity<Specialization>()
                 .HasKey(s => s.Id);
+
+            modelBuilder.Entity<EducationType>()
+            .HasKey(e => e.Id);
 
             // Decimal and Bit Type Configuration
             modelBuilder.Entity<Question>()

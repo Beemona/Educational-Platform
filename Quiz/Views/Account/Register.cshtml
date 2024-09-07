@@ -1,33 +1,88 @@
 ﻿@model UserRegistrationViewModel
 
-@{
-    var role = Model.Role;
-}
-
-<h2>Register</h2>
-
 <form asp-action="Register" method="post">
     <div class="form-group">
         <label asp-for="Role">Role</label>
-        <select asp-for="Role" asp-items="Html.GetEnumSelectList<UserRole>()" class="form-control"></select>
+        <select asp-for="Role" class="form-control">
+            <option value="">Select Role</option>
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Admin">Admin</option>
+        </select>
     </div>
 
-    @if (role == "Student")
-    {
-        <partial name="_StudentRegistrationPartial" model="Model" />
-    }
-    else if (role == "Teacher")
-    {
-        <partial name="_TeacherRegistrationPartial" model="Model" />
-    }
-    else if (role == "Admin")
-    {
-        <partial name="_AdminRegistrationPartial" model="Model" />
-    }
+    <!-- Basic fields for all users -->
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="UserName">Username</label>
+        <input asp-for="UserName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+
+    <!-- Dynamic role-specific fields -->
+    <div id="role-specific-fields">
+        @if (Model.Role == "Student")
+        {
+            @await Html.PartialAsync("_StudentRegistrationPartial", Model)
+        }
+        else if (Model.Role == "Teacher")
+        {
+            @await Html.PartialAsync("_TeacherRegistrationPartial", Model)
+        }
+        else if (Model.Role == "Admin")
+        {
+            @await Html.PartialAsync("_AdminRegistrationPartial", Model)
+        }
+    </div>
 
     <button type="submit" class="btn btn-primary">Register</button>
 </form>
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to update partial view content based on selected role
+            function updateRoleSpecificFields(role) {
+                fetch(`/Account/LoadRoleSpecificFields?role=${role}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('role-specific-fields').innerHTML = html;
+                    })
+                    .catch(error => console.error('Error loading role-specific fields:', error));
+            }
+
+            // Handle role change
+            document.querySelector('select[name="Role"]').addEventListener('change', function () {
+                const selectedRole = this.value;
+                if (selectedRole) {
+                    updateRoleSpecificFields(selectedRole);
+                } else {
+                    document.getElementById('role-specific-fields').innerHTML = '';
+                }
+            });
+        });
+
+    </script>
+}
+
+        
+
+@* <script>
+    document.getElementById('Role').addEventListener('change', function () {
+        var role = this.value;
+        window.location.href = '/Account/Register/' + role;
+    });
+</script> *@
 
 @* @using Authentication.Models
 @using Lesson.Models

@@ -22,7 +22,7 @@
 
             <div class="form-group">
                 @Html.LabelFor(model => model.LessonText)
-                @Html.TextAreaFor(model => model.LessonText)
+                @Html.TextAreaFor(model => model.LessonText, new { @class = "form-control", rows = "10" })
                 @Html.ValidationMessageFor(model => model.LessonText)
             </div>
 

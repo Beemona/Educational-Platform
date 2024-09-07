@@ -152,19 +152,16 @@ namespace Quiz.Controllers
 
             try
             {
-                // Fetch the existing lesson from the database
                 var existingLesson = await _context.LessonPreviews.FindAsync(id);
                 if (existingLesson == null)
                 {
                     return NotFound(); // Return 404 if the lesson is not found
                 }
 
-                // Update the lesson's properties
                 existingLesson.LessonTitle = lesson.LessonTitle;
                 existingLesson.LessonText = lesson.LessonText;
                 existingLesson.SubjectId = lesson.SubjectId; // Ensure this is a valid ID
 
-                // Validate the SubjectId
                 var subjectExists = await _context.Subjects.AnyAsync(s => s.Id == lesson.SubjectId);
                 if (!subjectExists)
                 {
@@ -172,14 +169,12 @@ namespace Quiz.Controllers
                     return View(lesson); // Return view with error
                 }
 
-                // Mark the entity as modified
                 _context.Entry(existingLesson).State = EntityState.Modified;
 
                 await _context.SaveChangesAsync(); // Save changes
             }
             catch (DbUpdateException ex)
             {
-                // Log the exception and provide meaningful feedback
                 Console.WriteLine($"Error: {ex.InnerException?.Message}");
                 ModelState.AddModelError("", "Unable to save changes. Try again later.");
                 return View(lesson); // Return view with error

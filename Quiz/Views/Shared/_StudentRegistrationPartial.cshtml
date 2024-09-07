@@ -1,0 +1,35 @@
+﻿@model StudentRegistrationViewModel
+
+    <div class="form-group">
+        <label asp-for="FacultyId">Faculty</label>
+        <select asp-for="FacultyId" class="form-control" id="facultyDropdown" onchange="this.form.submit()">
+            <option value="">Select Faculty</option>
+            @foreach (var faculty in Model.Faculties)
+            {
+                <option value="@faculty.Id" selected="@(Model.FacultyId == faculty.Id)">@faculty.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EducationTypeId">Education Type</label>
+        <select asp-for="EducationTypeId" class="form-control" id="educationTypeDropdown" onchange="this.form.submit()">
+            <option value="">Select Education Type</option>
+            @foreach (var educationType in Model.EducationTypes)
+            {
+                <option value="@educationType.Id" selected="@(Model.EducationTypeId == educationType.Id)">@educationType.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SpecializationId">Specialization</label>
+        <select asp-for="SpecializationId" class="form-control" id="specializationDropdown">
+            <option value="">Select Specialization</option>
+            @foreach (var specialization in Model.Specializations)
+            {
+                <option value="@specialization.Id" selected="@(Model.SpecializationId == specialization.Id)">@specialization.Name</option>
+            }
+        </select>
+    </div>
+

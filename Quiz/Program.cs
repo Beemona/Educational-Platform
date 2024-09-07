@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using QuizDbContext.Data;
 using QuizDbContext.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
@@ -76,5 +78,11 @@ app.MapControllerRoute(
     name: "admissions",
     pattern: "Admission/{action=Index}/{id?}",
     defaults: new { controller = "Admission" });
+
+app.MapControllerRoute(
+    name: "account",
+    pattern: "Account/{action=Index}/{id?}",
+    defaults: new { controller = "Account" });
+
 
 app.Run();

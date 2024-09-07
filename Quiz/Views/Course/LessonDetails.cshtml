@@ -1,9 +1,17 @@
-﻿@model Lesson.Models.LessonPreview
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        pre {
+            white-space: pre-wrap; /* Preserve whitespace but wrap text to fit the container */
+            overflow-wrap: break-word; /* Break long words and wrap text within the container */
+            word-wrap: break-word; /* For older browsers */
+            max-width: 100%; /* Ensure it does not exceed the container width */
+            overflow-x: auto; /* Add horizontal scroll only if necessary */
+        }
+        
+    </style>
 </head>
 <body>
     <div class="container">
@@ -14,12 +22,13 @@
             <div class="card-body">
                 <h5 class="card-title">Professor: @Model.ProfessorName</h5>
                 <div class="card-text">
-                    <p>@Model.LessonText</p>
+                    <pre>@Model.LessonText</pre>
                 </div>
 
                 <!-- Buttons -->
                 <div class="mt-4">
                     <button class="btn btn-primary" onclick="textToSpeech()">Text to Speech</button>
+
                     @if (!ViewBag.IsLessonFinished)
                     {
                         <button class="btn btn-success" onclick="finishLesson()">Finish Lesson</button>
@@ -61,10 +70,56 @@
 
     <script>
         function textToSpeech() {
-            var text = '@Model.LessonText'.replace(/(\r\n|\n|\r)/gm, " ");
+            // Get the raw text from the model
+            var text = '@Model.LessonText';
+
+            // Replace carriage return and line feed sequences with a pause
+            text = text.replace(/&#xD;&#xA;/g, " [PAUSE] ");  // Replace with a placeholder for pause
+
+            // Optionally, clean up other unwanted characters
+            text = text.replace(/[\u{0080}-\u{FFFF}]/gu, ""); // Remove non-ASCII characters
+            text = text.replace(/[\u{0000}-\u{001F}]/gu, ""); // Remove control characters
+            text = text.replace(/[^\x20-\x7E]/g, ""); // Remove non-printable ASCII characters
+
+            // Normalize whitespace and line breaks
+            text = text.replace(/\s{2,}/g, " ");         // Replace multiple spaces with a single space
+
+            // Optionally, trim extra spaces from the start and end
+            text = text.trim();
+
+            // Create a SpeechSynthesisUtterance with the sanitized text
             var speech = new SpeechSynthesisUtterance(text);
-            window.speechSynthesis.speak(speech);
+
+            // Optionally, adjust speech parameters (rate, pitch, volume)
+            speech.rate = 1;  // Adjust speech rate (0.1 to 10)
+            speech.pitch = 1; // Adjust speech pitch (0 to 2)
+            speech.volume = 1; // Adjust speech volume (0 to 1)
+
+            // Handle pauses by splitting text and speaking parts individually
+            var parts = text.split(" [PAUSE] ");
+            parts.forEach(function (part, index) {
+                var utterance = new SpeechSynthesisUtterance(part);
+                utterance.rate = speech.rate;
+                utterance.pitch = speech.pitch;
+                utterance.volume = speech.volume;
+
+                // Add a pause before speaking the next part
+                if (index < parts.length - 1) {
+                    utterance.onend = function () {
+                        setTimeout(function () {
+                            window.speechSynthesis.speak(new SpeechSynthesisUtterance(" "));
+                        }, 500); // Adjust the pause duration as needed (in milliseconds)
+                    };
+                }
+
+                window.speechSynthesis.speak(utterance);
+            });
         }
+
+        console.log("Original text:", '@Model.LessonText');
+        console.log("Cleaned text:", text);
+
+
 
         function finishLesson() {
             var lessonId = '@Model.Id';

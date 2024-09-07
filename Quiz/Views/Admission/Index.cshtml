@@ -88,31 +88,32 @@
                             <option value="">--Select Faculty--</option>
                             @foreach (var faculty in Model.Faculties)
                             {
-                                <option value="@faculty">@faculty</option>
+                                <option value="@faculty.Id">@faculty.Name</option>
                             }
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="SelectedDegree">Select Degree</label>
-                        <select id="SelectedDegree" name="SelectedDegree" class="form-control">
-                            <option value="">--Select Degree--</option>
-                            @foreach (var degree in Model.Degrees)
+                        <select id="SelectedEducationType" name="SelectedEducationType" class="form-control">
+                            <option value="">--Select Education Type--</option>
+                            @foreach (var educationType in Model.EducationTypes)
                             {
-                                <option value="@degree">@degree</option>
+                                <option value="@educationType.Id">@educationType.Name</option>
                             }
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="SelectedProgram">Select Program</label>
-                        <select id="SelectedProgram" name="SelectedProgram" class="form-control">
-                            <option value="">--Select Program--</option>
-                            @foreach (var program in Model.Programs)
+                        <select id="SelectedSpecialization" name="SelectedSpecialization" class="form-control">
+                            <option value="">--Select Specialization--</option>
+                            @foreach (var specialization in Model.Specializations)
                             {
-                                <option value="@program">@program</option>
+                                <option value="@specialization.Id">@specialization.Name</option>
                             }
                         </select>
+
                     </div>
 
                     <div class="form-group">
@@ -134,6 +135,7 @@
                             }
                         </select>
                     </div>
+
 
                     <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
                 </form>
@@ -246,71 +248,88 @@
                 step.classList.toggle('active', index === activeStepIndex);
             });
         }
+            $(document).ready(function () {
+                $('input[name="ExamType"]').change(function () {
+                    var examType = $(this).val();
+                    var examDetails = $('#ExamDetails');
+                    var examTitle = $('#ExamTitle');
+                    var numberOfQuestions = $('#NumberOfQuestions');
+                    var pointsPerQuestion = $('#PointsPerQuestion');
+                    var pointsRequired = $('#PointsRequired');
+                    var duration = $('#Duration');
 
-        $(document).ready(function () {
-            $('input[name="ExamType"]').change(function () {
-                var examType = $(this).val();
-                var examDetails = $('#ExamDetails');
-                var examTitle = $('#ExamTitle');
-                var numberOfQuestions = $('#NumberOfQuestions');
-                var pointsPerQuestion = $('#PointsPerQuestion');
-                var pointsRequired = $('#PointsRequired');
-                var duration = $('#Duration');
+                    if (examType === "Online") {
+                        examTitle.text("Online Quiz");
+                        numberOfQuestions.text("50");
+                        pointsPerQuestion.text("2");
+                        pointsRequired.text("80");
+                        duration.text("30 minutes");
+                    } else if (examType === "Paper") {
+                        examTitle.text("Paper Exam");
+                        numberOfQuestions.text("50");
+                        pointsPerQuestion.text("1");
+                        pointsRequired.text("40");
+                        duration.text("1 hour");
+                    }
 
-                if (examType === "Online") {
-                    examTitle.text("Online Quiz");
-                    numberOfQuestions.text("50");
-                    pointsPerQuestion.text("2");
-                    pointsRequired.text("80");
-                    duration.text("30 minutes");
-                } else if (examType === "Paper") {
-                    examTitle.text("Paper Exam");
-                    numberOfQuestions.text("50");
-                    pointsPerQuestion.text("1");
-                    pointsRequired.text("40");
-                    duration.text("1 hour");
-                }
+                    examDetails.show();
+                });
 
-                examDetails.show();
+            $('#SelectedEducationType').change(function () {
+                var educationTypeId = $(this).val();
+                var facultyId = $('#SelectedFaculty').val(); // Get the selected faculty
+                var specializationSelect = $('#SelectedSpecialization');
+
+                // Clear previous specializations
+                specializationSelect.empty();
+                specializationSelect.append('<option value="">--Select Specialization--</option>');
+
+                // Fetch and populate specializations based on selected education type and faculty
+                $.get('/Admission/GetSpecializations', { educationTypeId: educationTypeId, facultyId: facultyId }, function (specializations) {
+                    $.each(specializations, function (index, specialization) {
+                        specializationSelect.append('<option value="' + specialization.Id + '">' + specialization.Name + '</option>');
+                    });
+                });
             });
 
-            $('#SelectedDegree').change(function () {
-                var degree = $(this).val();
-                var additionalRequirements = $('#additionalRequirements');
-                additionalRequirements.empty(); // Clear previous content
 
-                if (degree === "Bachelor") {
-                    additionalRequirements.append(`
-                                <div class="form-check">
-                                    <input type="checkbox" id="FinishedSAT" name="FinishedSAT" class="form-check-input" />
-                                    <label class="form-check-label" for="FinishedSAT">I have finished my SATs</label>
-                                </div>
-                                <div class="form-group mt-3">
-                                    <label for="SATDiploma">Upload SAT Diploma</label>
-                                    <input type="file" id="SATDiploma" name="SATDiploma" class="form-control-file" />
-                                </div>
-                            `);
-                } else if (degree === "Master") {
-                    additionalRequirements.append(`
-                                <div class="form-check">
-                                    <input type="checkbox" id="FinishedBachelors" name="FinishedBachelors" class="form-check-input" />
-                                    <label class="form-check-label" for="FinishedBachelors">I have finished my Bachelor's</label>
-                                </div>
-                                <div class="form-group mt-3">
-                                    <label for="BachelorsDiploma">Upload Bachelor's Diploma</label>
-                                    <input type="file" id="BachelorsDiploma" name="BachelorsDiploma" class="form-control-file" />
-                                </div>
-                            `);
-                } else {
-                    additionalRequirements.append(`
-                                <div class="form-group mt-3">
-                                    <label for="ProofFutureCompletion">Upload Proof of Future Completion</label>
-                                    <input type="file" id="ProofFutureCompletion" name="ProofFutureCompletion" class="form-control-file" />
-                                </div>
-                            `);
-                }
+                $('#SelectedDegree').change(function () {
+                    var degree = $(this).val();
+                    var additionalRequirements = $('#additionalRequirements');
+                    additionalRequirements.empty(); // Clear previous content
+
+                    if (degree === "Bachelor") {
+                        additionalRequirements.append(`
+                        <div class="form-check">
+                            <input type="checkbox" id="FinishedSAT" name="FinishedSAT" class="form-check-input" />
+                            <label class="form-check-label" for="FinishedSAT">I have finished my SATs</label>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="SATDiploma">Upload SAT Diploma</label>
+                            <input type="file" id="SATDiploma" name="SATDiploma" class="form-control-file" />
+                        </div>
+                    `);
+                    } else if (degree === "Master") {
+                        additionalRequirements.append(`
+                        <div class="form-check">
+                            <input type="checkbox" id="FinishedBachelors" name="FinishedBachelors" class="form-check-input" />
+                            <label class="form-check-label" for="FinishedBachelors">I have finished my Bachelor's</label>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="BachelorsDiploma">Upload Bachelor's Diploma</label>
+                            <input type="file" id="BachelorsDiploma" name="BachelorsDiploma" class="form-control-file" />
+                        </div>
+                    `);
+                    } else {
+                        additionalRequirements.append(`
+                        <div class="form-group mt-3">
+                            <label for="ProofFutureCompletion">Upload Proof of Future Completion</label>
+                            <input type="file" id="ProofFutureCompletion" name="ProofFutureCompletion" class="form-control-file" />
+                        </div>
+                    `);
+                    }
+                });
             });
-        });
     </script>
 </body>
 </html>

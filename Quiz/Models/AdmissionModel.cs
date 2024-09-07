@@ -4,18 +4,37 @@ namespace Admission.Model
 {
     public class AdmissionViewModel
     {
-        // Properties for the form fields
-        public string? SelectedFaculty { get; set; }
-        public string? SelectedDegree { get; set; }
-        public string? SelectedProgram { get; set; }
-        public string? LearningType { get; set; }
-        public string? ApplicationType { get; set; }
+        public List<Faculty> Faculties { get; set; }
+        public List<Specialization> Specializations { get; set; }
+        public List<EducationType> EducationTypes { get; set; }
+        public List<string>? ApplicationTypes { get; set; } // Add this line
+        public List<string>? LearningTypes { get; set; }   // Add this line
 
-        // Options for dropdowns
-        public List<string>? Faculties { get; set; }
-        public List<string>? Degrees { get; set; }
-        public List<string>? Programs { get; set; }
-        public List<string>? LearningTypes { get; set; }
-        public List<string>? ApplicationTypes { get; set; }
+        public AdmissionViewModel()
+        {
+            Faculties = new List<Faculty>();
+            Specializations = new List<Specialization>();
+            EducationTypes = new List<EducationType>();
+        }
+
+        public class Faculty
+        {
+            public int? Id { get; set; }
+            public string? Name { get; set; }
+        }
+
+        public class Specialization
+        {
+            public int? Id { get; set; }
+            public string? Name { get; set; }
+            public int? FacultyId { get; set; }
+            public int? EducationTypeId { get; set; }
+        }
+
+        public class EducationType
+        {
+            public int? Id { get; set; }
+            public string? Name { get; set; }
+        }
     }
 }

@@ -1,37 +1,54 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Admission.Model; // Replace with your actual namespace
+using Microsoft.EntityFrameworkCore;
+using Admission.Model;
+using QuizDbContext.Data; // Adjust namespace as necessary
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 public class AdmissionController : Controller
 {
+    private readonly ApplicationDbContext _context;
+
+    public AdmissionController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
     // GET: Admission
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var model = new AdmissionViewModel
         {
-            Faculties = new List<string>
-            {
-                "Faculty of Psychology",
-                "Faculty of Math",
-                "Faculty of Engineering"
-            },
-            Degrees = new List<string>
-            {
-                "Bachelor",
-                "Master",
-                "Doctorate"
-            },
-            Programs = new List<string>(),
-            LearningTypes = new List<string>
-            {
-                "Distance Learning",
-                "On Campus"
-            },
-            ApplicationTypes = new List<string>
-            {
-                "Budget",
-                "Tax",
-                "Both"
-            }
+            Faculties = await _context.Faculties
+                .Select(f => new AdmissionViewModel.Faculty
+                {
+                    Id = f.Id,
+                    Name = f.Name
+                })
+                .ToListAsync(),
+
+            EducationTypes = await _context.EducationTypes
+                .Select(e => new AdmissionViewModel.EducationType
+                {
+                    Id = e.Id,
+                    Name = e.Name
+                })
+                .ToListAsync(),
+
+            Specializations = await _context.Specializations
+                .Select(s => new AdmissionViewModel.Specialization
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    FacultyId = s.FacultyId ?? 0,
+                    EducationTypeId = s.EducationTypeId ?? 0
+                })
+                .ToListAsync(),
+
+            // Example data for ApplicationTypes and LearningTypes
+            ApplicationTypes = new List<string> { "Type1", "Type2", "Type3" },
+            LearningTypes = new List<string> { "Full-time", "Part-time" }
         };
 
         return View(model);
@@ -39,66 +56,27 @@ public class AdmissionController : Controller
 
     // POST: Admission
     [HttpPost]
-    public IActionResult Index(AdmissionViewModel model)
+    public async Task<IActionResult> Index(AdmissionViewModel model)
     {
         // Handle form submission, save to database, etc.
-        // For now, just redirect or return a view with the submitted data
+        // Example: Save model to the database
+        // await _context.SaveChangesAsync();
+
         return View(model); // For demonstration purposes
     }
 
-    [HttpPost]
-    public IActionResult UpdatePrograms(string faculty, string degree)
+    [HttpGet]
+    public async Task<IActionResult> GetSpecializations(int educationTypeId, int facultyId)
     {
-        var programs = GetPrograms(faculty, degree);
-        return Json(programs);
-    }
+        var specializations = await _context.Specializations
+           .Where(s => s.FacultyId == facultyId && s.EducationTypeId == educationTypeId)
+           .Select(s => new
+           {
+               Id = s.Id,
+               Name = s.Name
+           })
+           .ToListAsync();
 
-    private List<string> GetPrograms(string faculty, string degree)
-    {
-        var programs = new List<string>();
-
-        if (faculty == "Faculty of Psychology")
-        {
-            if (degree == "Bachelor")
-            {
-                programs.Add("Bachelor of Psychology");
-            }
-            else if (degree == "Master")
-            {
-                programs.Add("Clinical Psychology");
-                programs.Add("Psychotherapy");
-                programs.Add("Forensic Psychology");
-                programs.Add("Human Resources");
-            }
-        }
-        else if (faculty == "Faculty of Math")
-        {
-            if (degree == "Bachelor")
-            {
-                programs.Add("Bachelor of Mathematics");
-            }
-            else if (degree == "Master")
-            {
-                programs.Add("Master of Mathematics");
-                programs.Add("Educational Master");
-            }
-        }
-        else if (faculty == "Faculty of Engineering")
-        {
-            if (degree == "Bachelor")
-            {
-                programs.Add("Bachelor of Computer Science");
-                programs.Add("Bachelor of Electronics");
-                programs.Add("Bachelor of Electrical Engineering");
-            }
-            else if (degree == "Master")
-            {
-                programs.Add("Master in Web Development");
-                programs.Add("Master in AI");
-                programs.Add("Master in Software Engineering");
-            }
-        }
-
-        return programs;
+        return Json(specializations);
     }
 }

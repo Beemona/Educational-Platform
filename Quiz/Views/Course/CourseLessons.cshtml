@@ -3,29 +3,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer; /* Changes the cursor to a pointer when hovering over the card */
+        }
+
+            .card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+
+        .card-img-top {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px; /* Space between image and text */
+        }
+
+        .card-body {
+            padding: 30px; /* Increased padding for more space inside the card */
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #36454f;
+            margin-bottom: 15px; /* Space for the divider */
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #36454f;
+            margin-bottom: 10px; /* Space between text elements */
+        }
+
+        .divider {
+            border: none;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 20px 0; /* Space around the divider */
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .card a {
+            text-decoration: none; /* Ensure no underline for links inside cards */
+            color: inherit; /* Inherit color from parent */
+        }
+
+            .card a:hover {
+                text-decoration: none; /* No underline on hover */
+                color: inherit; /* Ensure color does not change on hover */
+            }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2>@Model.Subject.Title Lessons</h2>
+        <h2 class="mb-4">@Model.Subject.Title Lessons</h2>
         <!-- Lesson Cards -->
         <div class="row">
             @foreach (var lesson in Model.Lessons)
             {
-                <div class="col-md-4 mb-3">
-                    <a href="@Url.Action("LessonDetails", "Course", new { lessonId = lesson.Id })" class="card" style="background-color:#E1E8ED; text-decoration:none;">
+                <div class="col-md-4 mb-4">
+                    <a href="@Url.Action("LessonDetails", "Course", new { lessonId = lesson.Id })" class="card" style="background-color:#CADABF;">
                         <div class="card-body">
                             <h5 class="card-title">@lesson.LessonTitle</h5>
-                            <p class="card-text">Title: @lesson.LessonTitle</p>
-                            <p class="card-text">Week: @lesson.WeekNumber</p>
-                            <p class="card-text">Date: @lesson.DateRange</p>
-                            <p class="card-text">Year: @lesson.Year</p>
-                            <p class="card-text">Summary: @lesson.Summary</p>
+                            <hr class="divider" />
+                            <p class="card-text"><strong>Title:</strong> @lesson.LessonTitle</p>
+                            <p class="card-text"><strong>Week:</strong> @lesson.WeekNumber</p>
+                            <p class="card-text"><strong>Date:</strong> @lesson.DateRange</p>
+                            <p class="card-text"><strong>Year:</strong> @lesson.Year</p>
+                            <p class="card-text"><strong>Summary:</strong> @lesson.Summary</p>
                         </div>
                     </a>
                 </div>
             }
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

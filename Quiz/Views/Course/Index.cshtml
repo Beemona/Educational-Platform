@@ -3,29 +3,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer; /* Changes the cursor to a pointer when hovering over the card */
+        }
+
+            .card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+
+        .card-img-top {
+            border-bottom: 2px solid #ddd;
+        }
+
+        .card-body {
+            padding: 30px; /* Increased padding for more space inside the card */
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #36454f;
+            margin-bottom: 15px; /* Increased margin for more space below the title */
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #36454f;
+            margin-bottom: 10px; /* Added margin to separate paragraphs */
+        }
+
+        .divider {
+            border: none;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 20px 0; /* Increased margin around the divider */
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .row {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2>Courses</h2>
+        <h2 class="mb-4">Courses</h2>
 
         <div class="row">
             @foreach (var course in Model)
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card" style="background-color:@course.BackgroundColor;">
-                        <img src="@course.IconUrl" class="card-img-top" alt="@course.Title" />
+                <div class="col-md-4 mb-4">
+                    <a href="@Url.Action("Details", "Course", new { id = course.Id })" class="card" style="background-color:@course.BackgroundColor; text-decoration: none;">
                         <div class="card-body">
                             <h5 class="card-title">@course.Title</h5>
-                            <p class="card-text">Code: @course.Code</p>
-                            <p class="card-text">Course Professor: @course.CourseProfessor</p>
-                            <p class="card-text">Seminar Professor: @course.SeminarProfessor</p>
-                            <a href="@Url.Action("Details", "Course", new { id = course.Id })" class="btn btn-primary">View Details</a>
+                            <hr class="divider" />
+                            <p class="card-text"><strong>Code:</strong> @course.Code</p>
+                            <p class="card-text"><strong>Course Professor:</strong> @course.CourseProfessor</p>
+                            <p class="card-text"><strong>Seminar Professor:</strong> @course.SeminarProfessor</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

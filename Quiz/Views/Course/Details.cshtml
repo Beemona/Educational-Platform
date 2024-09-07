@@ -3,67 +3,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer; /* Changes the cursor to a pointer when hovering over the card */
+        }
+
+            .card:hover {
+                transform: translateY(-10px);
+                text-decoration: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+
+        .card-img-top {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px; /* Space between image and text */
+        }
+
+        .card-body {
+            padding: 30px; /* Increased padding for more space inside the card */
+            text-decoration: none; /* Ensure no underline */
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #36454f;
+            margin-bottom: 15px; /* Space for the divider */
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #36454f;
+            margin-bottom: 10px; /* Space between text elements */
+            text-decoration: none;
+        }
+
+        .divider {
+            border: none;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 20px 0; /* Space around the divider */
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .card a {
+            text-decoration: none; /* Ensure no underline for links inside cards */
+            color: inherit; /* Inherit color from parent */
+        }
+
+        .p {
+            text-decoration: none; /* Ensure no underline for links inside cards */
+        }
+
+            /* Specific styles for clickable cards */
+            .card a:hover {
+                text-decoration: none; /* No underline on hover */
+                color: inherit; /* Ensure color does not change on hover */
+            }
+    </style>
 </head>
 <body>
     <div class="container">
         <h2>@Model.Title Details</h2>
 
         <!-- Existing Course Details -->
-        <div class="card mb-3" style="background-color:@Model.BackgroundColor;">
+        <div class="card mb-4" style="background-color:@Model.BackgroundColor;">
             <div class="card-body">
                 <img src="@Model.IconUrl" alt="@Model.Title" class="card-img-top" />
                 <h5 class="card-title">@Model.Title</h5>
+                <hr class="divider" />
                 <p class="card-text">Code: @Model.Code</p>
                 <p class="card-text">Course Professor: @Model.CourseProfessor</p>
                 <p class="card-text">Seminar Professor: @Model.SeminarProfessor</p>
             </div>
         </div>
 
-        <!-- Course Card -->
-        @if (Model.CourseCard != null)
-        {
-            <div class="card mb-3" style="background-color:#D1E7DD;">
-                <div class="card-body">
-                    <h5 class="card-title">Course Card</h5>
-                    <p class="card-text">Title: @Model.CourseCard.Title</p>
-                    <p class="card-text">Professor: @Model.CourseCard.Professor</p>
-                    <p class="card-text">Lessons Posted: @Model.CourseCard.NumberOfLessonsPosted</p>
-                    <p class="card-text">Weeks Passed: @Model.CourseCard.WeeksPassed</p>
-                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = false })" class="btn btn-primary">View Course Lessons</a>
+        <!-- Additional Cards in a Row -->
+        <div class="row">
+            @if (Model.CourseCard != null)
+            {
+                <div class="col-md-4 mb-4">
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = false })" class="card" style="background-color:#D4E7C5;">
+                        <div class="card-body">
+                            <h5 class="card-title">Course Card</h5>
+                            <hr class="divider" />
+                            <p class="card-text">Title: @Model.CourseCard.Title</p>
+                            <p class="card-text">Professor: @Model.CourseCard.Professor</p>
+                            <p class="card-text">Lessons Posted: @Model.CourseCard.NumberOfLessonsPosted</p>
+                            <p class="card-text">Weeks Passed: @Model.CourseCard.WeeksPassed</p>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        }
+            }
 
-        <!-- Seminar Card -->
-        @if (Model.SeminarCard != null)
-        {
-            <div class="card mb-3" style="background-color:#CFE2F3;">
-                <div class="card-body">
-                    <h5 class="card-title">Seminar Card</h5>
-                    <p class="card-text">Title: @Model.SeminarCard.Title</p>
-                    <p class="card-text">Professor: @Model.SeminarCard.Professor</p>
-                    <p class="card-text">Lessons Posted: @Model.SeminarCard.NumberOfLessonsPosted</p>
-                    <p class="card-text">Weeks Passed: @Model.SeminarCard.WeeksPassed</p>
-                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = true })" class="btn btn-primary">View Seminar Lessons</a>
+            @if (Model.SeminarCard != null)
+            {
+                <div class="col-md-4 mb-4">
+                    <a href="@Url.Action("CourseLessons", "Course", new { id = Model.Id, isSeminar = true })" class="card" style="background-color:#DFD3C3;">
+                        <div class="card-body">
+                            <h5 class="card-title">Seminar Card</h5>
+                            <hr class="divider" />
+                            <p class="card-text">Title: @Model.SeminarCard.Title</p>
+                            <p class="card-text">Professor: @Model.SeminarCard.Professor</p>
+                            <p class="card-text">Lessons Posted: @Model.SeminarCard.NumberOfLessonsPosted</p>
+                            <p class="card-text">Weeks Passed: @Model.SeminarCard.WeeksPassed</p>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        }
+            }
 
-
-        <!-- Final Exam Card -->
-        @if (Model.FinalExam != null)
-        {
-            <div class="card mb-3" style="background-color:#F9CB9C;">
-                <div class="card-body">
-                    <h5 class="card-title">Final Exam</h5>
-                    <p class="card-text">Exam Name: @Model.FinalExam.ExamName</p>
-                    <p class="card-text">Number of Questions: @Model.FinalExam.NumberOfQuestions</p>
-                    <p class="card-text">Total Points: @Model.FinalExam.TotalPoints</p>
-                    <a href="@Url.Action("Index", "Quiz")" class="btn btn-primary">Take Final Exam</a>
+            @if (Model.FinalExam != null)
+            {
+                <div class="col-md-4 mb-4">
+                    <a href="@Url.Action("Index", "Quiz")" class="card" style="background-color:#F9CB9C;">
+                        <div class="card-body">
+                            <h5 class="card-title">Final Exam</h5>
+                            <hr class="divider" />
+                            <p class="card-text">Exam Name: @Model.FinalExam.ExamName</p>
+                            <p class="card-text">Number of Questions: @Model.FinalExam.NumberOfQuestions</p>
+                            <p class="card-text">Total Points: @Model.FinalExam.TotalPoints</p>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

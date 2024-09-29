@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Presentation";
+}
+
+<h2>Does the presentation have content?</h2>
+
+<form asp-action="HandlePresentation" method="post">
+    <div>
+        <input type="checkbox" id="hasContent" name="hasContent" value="true" />
+        <label for="hasContent">Yes</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Proceed</button>
+</form>

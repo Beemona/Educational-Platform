@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Presentation With Content";
+}
+
+<h2>Presentation With Content</h2>
+
+<div id="pptContent">
+    <!-- Display the converted PowerPoint content -->
+    @Html.Raw(ViewData["PptContent"])
+</div>
+
+<hr />
+
+<!-- Import PowerPoint -->
+<form asp-action="ImportPowerPoint" method="post" enctype="multipart/form-data">
+    <label for="pptFile">Import PowerPoint:</label>
+    <input type="file" id="pptFile" name="pptFile" accept=".ppt,.pptx" />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<!-- Import Word Document -->
+<hr />
+<form asp-action="UploadWord" method="post" enctype="multipart/form-data">
+    <label for="wordFile">Import Word Document:</label>
+    <input type="file" id="wordFile" name="wordFile" accept=".doc,.docx" />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<!-- Display Word Content -->
+<div id="wordContent" style="margin-top: 20px;">
+    @if (ViewData["HtmlContent"] != null)
+    {
+        @Html.Raw(ViewData["HtmlContent"])
+    }
+</div>
+
+<!-- Export PowerPoint -->
+<div style="margin-top: 20px;">
+    <button type="button" class="btn btn-success" onclick="exportPowerPoint()">Export PowerPoint</button>
+</div>
+
+<script>
+    // Placeholder for exporting the presentation (requires backend logic)
+    function exportPowerPoint() {
+        alert('Export PowerPoint functionality is not yet implemented.');
+    }
+</script>

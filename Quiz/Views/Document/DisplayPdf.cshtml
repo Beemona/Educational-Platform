@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Uploaded PDF";
+}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<div class="container">
+    <h1>Uploaded PDF</h1>
+
+    @if (ViewData["PdfUrl"] != null)
+    {
+        <h2>PDF Preview</h2>
+        <iframe src="@ViewData["PdfUrl"]" width="100%" height="600px" style="border: none;"></iframe>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            No PDF has been uploaded yet.
+        </div>
+    }
+
+    <hr />
+
+    <a asp-controller="Document" asp-action="UploadPdf" class="btn btn-secondary">Upload Another PDF</a>
+</div>

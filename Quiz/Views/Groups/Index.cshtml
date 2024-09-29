@@ -1,0 +1,113 @@
+﻿@using Quiz.Models
+@using Authentication.Models
+
+@model List<Group> // Ensure the model is of type List<Group>
+
+@{
+    ViewData["Title"] = "Group Management";
+    var students = ViewBag.Students as List<Student>; // Retrieve the students from ViewBag
+}
+
+    <h2>Groups</h2>
+
+    <!-- Button to display the group creation form -->
+    <a class="btn btn-primary" href="#createGroupModal" data-toggle="modal">Create New Group</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Group Name</th>
+                <th>Group Type</th>
+                <th>Students</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model != null && Model.Any()) // Check if the model is not null and has groups
+        {
+            foreach (var group in Model) // Iterating through the list of groups
+            {
+                    <tr>
+                        <td>@group.Name</td>
+                        <td>@group.GroupType</td>
+                        <td>
+                        @if (group.Students != null && group.Students.Any())
+                        {
+                                <ul>
+                                @foreach (var student in group.Students)
+                                {
+                                        <li>@student.Name (Faculty: @student.Faculty?.Name, EducationType: @student.EducationType?.Name, Specialization: @student.Specialization?.Name)</li>  <!-- Display student name and details -->
+                                }
+                                </ul>
+                        }
+                        else
+                        {
+                                <span>No students assigned</span>
+                        }
+                        </td>
+                    </tr>
+            }
+        }
+        else
+        {
+                <tr>
+                    <td colspan="3" class="text-center">No groups available.</td>
+                </tr>
+        }
+        </tbody>
+    </table>
+
+    <!-- Create Group Modal -->
+    <div class="modal fade" id="createGroupModal" tabindex="-1" role="dialog" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form asp-action="CreateGroup" method="post">
+                    <!-- Form to create a new group -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createGroupModalLabel">Create New Group</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="groupName">Group Name</label>
+                            <input type="text" class="form-control" id="groupName" name="groupName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="groupType">Group Type</label>
+                            <select class="form-control" id="groupType" name="groupType" required>
+                                <option value="">Select Group Type</option>
+                                <option value="class">Class</option>
+                                <option value="project">Project Group</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="students">Select Students</label>
+                            <select id="students" name="selectedStudents" class="form-control" multiple required>
+                            @foreach (var student in students)
+                            {
+                                    <option value="@student.Id">@student.Name</option> <!-- Display each student as an option -->
+                            }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Group</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+        <script>
+            // Initialize the modal when the page is ready
+            $(document).ready(function () {
+                $('#createGroupModal').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget); // Button that triggered the modal
+                    // Optional: Additional logic can go here
+                });
+            });
+        </script>
+}

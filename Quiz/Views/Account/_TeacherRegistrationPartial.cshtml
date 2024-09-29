@@ -1,0 +1,7 @@
+﻿@model TeacherRegistrationViewModel
+
+<div class="form-group">
+    <label asp-for="DepartmentId">Department</label>
+    <select asp-for="DepartmentId" asp-items="@(new SelectList(Model.Departments, "Id", "Name"))" class="form-control"></select>
+</div>
+

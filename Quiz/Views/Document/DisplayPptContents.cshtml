@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "PowerPoint Presentation Contents";
+}
+<style>
+    .slide-container {
+        position: relative;
+        width: 720px; /* Standard slide width */
+        height: 540px; /* Standard slide height */
+        margin: 20px auto;
+        border: 2px solid #ccc;
+        background-color: #f8f8f8; /* Fallback background color */
+        overflow: hidden;
+    }
+
+    .slide-title {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .shape-text {
+        position: absolute; /* Will be styled dynamically based on shape positioning */
+        padding: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+    }
+
+    .slide img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
+<div class="slide-container">
+    @Html.Raw(ViewData["PptContent"])
+</div>
+
+<div class="container">
+    <h1>PowerPoint Presentation Contents</h1>
+
+    @if (ViewData["HtmlContent"] != null)
+    {
+        @Html.Raw(ViewData["HtmlContent"])
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            No content available to display.
+        </div>
+    }
+
+    <hr />
+
+    <a asp-controller="Document" asp-action="UploadPPT" class="btn btn-secondary">Upload Another PowerPoint</a>
+</div>

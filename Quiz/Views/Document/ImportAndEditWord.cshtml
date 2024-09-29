@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Import and Edit Word Document";
+}
+
+<div class="container">
+    <h1>Import Word Document</h1>
+
+    <form asp-action="ImportWord" enctype="multipart/form-data" method="post">
+        <div class="form-group">
+            <label for="wordFile">Upload Word File:</label>
+            <input type="file" id="wordFile" name="wordFile" accept=".docx" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Import Word</button>
+    </form>
+
+    @if (ViewData["WordContent"] != null)
+    {
+        <hr />
+        <h2>Word Document Content</h2>
+        <form asp-action="SaveWordContent" method="post">
+            <textarea name="editedContent" class="form-control" rows="15">@Html.Raw(ViewData["WordContent"])</textarea>
+            <button type="submit" class="btn btn-success mt-3">Save Changes</button>
+        </form>
+    }
+    }

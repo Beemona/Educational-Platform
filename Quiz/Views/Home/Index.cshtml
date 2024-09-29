@@ -1,44 +1,116 @@
-﻿@* @model List<QuestionModel.Models.Question>
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
 
-@using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
-{
-    <div class="form-group">
-        <label for="studentName">Your Name:</label>
-        <input type="text" id="studentName" name="studentName" class="form-control" required />
-
-    </div>
-
-    @if (Model == null || !Model.Any())
-    {
-        <p>No questions available.</p>
-    }
-    else
-    {
-        @foreach (var question in Model)
-        {
-            <div>
-                <h3>@question.Text</h3>
-                @if (question.Options != null)
-                {
-                    @foreach (var option in question.Options)
-                    {
-                        <label>
-                            <input type="radio" name="answers[@question.Id]" value="@option.Value" />
-                            @option.Value. @option.Text
-                        </label>
-                        <br />
-                    }
-                }
-                else
-                {
-                    <p>No options available for this question.</p>
-                }
-            </div>
-            <hr />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quiz</title>
+    <link rel="stylesheet" href="httpsstackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Ensure body and container styles do not interfere with layout */
+        body {
+            background-color: #f8f9fa; /* Light background color */
+            margin: 0;
+            padding: 0;
         }
 
-        <!-- Submit button -->
-        <button type="submit" class="btn btn-primary">Submit Quiz</button>
-    }
-}
- *@
+        /* Styling for the welcome container to ensure it aligns properly */
+        .welcome-container {
+            text-align: center;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto; /* Center the container horizontally */
+        }
+
+            /* Styling for heading and paragraph within welcome container */
+            .welcome-container h2 {
+                margin-bottom: 20px;
+                font-size: 2.5rem;
+                color: #333;
+            }
+
+            .welcome-container p {
+                margin-bottom: 30px;
+                font-size: 1.2rem;
+                color: #555;
+            }
+
+        /* Styling for buttons within the button group */
+        .btn-group .btn {
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h2>Welcome to our page</h2>
+        <p>Are you a student or teacher?</p>
+        <div class="btn-group" role="group">
+            <a href="/Account/StudentLogin" class="btn btn-primary">Student</a>
+            <a href="/Account/TeacherLogin" class="btn btn-primary">Teacher</a>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h2>Available Pages</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Groups" asp-action="Index">Groups</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="Presentation">Presentation</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="SelectExamType">Exam Type</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Booking" asp-action="BookMeeting">Book</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadWord">Word</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadExcel">Excel</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadPDF">PDF</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Admission" asp-action="Index">Admission</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="QuizCreation" asp-action="Create">Create a Quiz!</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="AddQuestion">Questions</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="Index">Teacher</a>
+            </li>
+            <li class="list-group-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Course" asp-action="Index">Course</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Include jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS last -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

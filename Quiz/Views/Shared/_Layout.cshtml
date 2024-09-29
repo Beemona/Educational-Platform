@@ -11,7 +11,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Quiz</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -19,17 +19,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Quiz">Quiz</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Excel" asp-action="Upload">Excel</a>
+                         <a class="nav-link text-dark" asp-area="" asp-controller="Layout" asp-action="Index">All Pages</a>
+                           @*  <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="Presentation">Presentation</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="SelectExamType">Exam Type</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Booking" asp-action="BookMeeting">Book</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadWord">Word</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadExcel">Excel</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Document" asp-action="UploadPDF">PDF</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Admission" asp-action="Index">Admission</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="QuizCreation" asp-action="Create">Create a Quiz!</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="AddQuestion">Questions</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="Index">Teacher</a>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Course" asp-action="Index">Course</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Course" asp-action="Index">Course</a> *@
                         </li>
                     </ul>
                 </div>
@@ -44,7 +49,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - Quiz - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - All Pages - <a asp-area="" asp-controller="Layout" asp-action="Index">AllPages</a>
             &copy; 2024 - Quiz - <a asp-area="" asp-controller="Teacher" asp-action="Index">Teacher</a>
         </div>
     </footer>

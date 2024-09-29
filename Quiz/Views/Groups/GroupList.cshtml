@@ -1,0 +1,36 @@
+﻿@model List<Quiz.Models.Group> // Adjust the namespace accordingly
+
+@{
+    ViewData["Title"] = "Group List";
+}
+
+<h2>Created Groups</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Group Name</th>
+            <th>Group Type</th>
+            <th>Number of Students</th>
+            <th>Students</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in Model)
+        {
+            <tr>
+                <td>@group.Name</td>
+                <td>@group.GroupType</td>
+                <td>@group.Students.Count</td>
+                <td>
+                    <ul>
+                        @foreach (var student in group.Students)
+                        {
+                            <li>@student.Name (@student.Faculty?.Name, @student.EducationType?.Name, @student.Specialization?.Name)</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

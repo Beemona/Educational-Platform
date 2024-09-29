@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuestionModel.Models;
 using Quiz.Models;
+using QuizDbContext.Data;
 using QuizDbContext.Services;
 using StudentModel.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace QuizController.Controllers
 {
@@ -13,12 +15,14 @@ namespace QuizController.Controllers
         private readonly IStudentResultService _studentResultService;
         private readonly IQuestionService _questionService;
         private readonly IQuizService _quizService;
+        private readonly ApplicationDbContext _context;
 
-        public QuizController(IStudentResultService studentResultService, IQuestionService questionService, IQuizService quizService)
+        public QuizController(IStudentResultService studentResultService, IQuestionService questionService, IQuizService quizService, ApplicationDbContext context)
         {
             _studentResultService = studentResultService;
             _questionService = questionService;
             _quizService = quizService;
+            _context = context;
         }
 
         // GET: /Quiz/Index
@@ -111,15 +115,26 @@ namespace QuizController.Controllers
                 });
             }
 
+            // Get the current user's ID from claims
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Retrieve the user from the database
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound(); // Handle the case where the user isn't found
+            }
+
             var studentResult = new StudentResult
             {
-                StudentName = model.StudentName,
+                Id = user.Id, // Change this from model.Name to model.StudentName
+                StudentName = user.Name,
                 Score = score, // Use the accumulated score
                 TotalQuestions = model.Questions.Count,
                 ResultDetails = resultDetails // Use the results built in the loop
             };
 
-            await _studentResultService.SaveStudentResultAsync(studentResult); // Ensure SaveStudentResultAsync is implemented
+            await _context.StudentResults.AddAsync(studentResult);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", "Teacher");
         }

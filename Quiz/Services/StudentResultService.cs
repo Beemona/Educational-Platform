@@ -22,7 +22,7 @@ public class StudentResultService : IStudentResultService
         // Log or debug output
         foreach (var result in results)
         {
-            Console.WriteLine($"Student: {result.StudentName}, Results Count: {result.ResultDetails?.Count}");
+            Console.WriteLine($"Student: {result.User?.Name}, Results Count: {result.ResultDetails?.Count}");
         }
 
         return results;
@@ -32,14 +32,15 @@ public class StudentResultService : IStudentResultService
     public void SaveStudentResult(StudentResult studentResult)
     {
         if (studentResult != null &&
-            !string.IsNullOrEmpty(studentResult.StudentName) &&
+            !string.IsNullOrEmpty(studentResult.User?.Name) &&
             studentResult.ResultDetails != null &&
             studentResult.ResultDetails.All(r => !string.IsNullOrEmpty(r.QuestionText) && r.Points.HasValue))
         {
             // Ensure each QuestionResult has the correct StudentResultId
             foreach (var resultDetail in studentResult.ResultDetails)
             {
-                resultDetail.StudentResultId = studentResult.Id;
+
+                resultDetail.StudentResultId = studentResult.Id.Value;
             }
 
             _context.StudentResults.Add(studentResult);
@@ -53,7 +54,7 @@ public class StudentResultService : IStudentResultService
     public async Task SaveStudentResultAsync(StudentResult studentResult)
     {
         if (studentResult != null &&
-            !string.IsNullOrEmpty(studentResult.StudentName) &&
+            !string.IsNullOrEmpty(studentResult.User?.Name) &&
             studentResult.ResultDetails != null &&
             studentResult.ResultDetails.All(r => r.QuestionText != null))
         {

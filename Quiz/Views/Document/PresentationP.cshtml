@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Presentation Without Content";
+}
+
+<h2>Presentation Without Content</h2>
+
+<div>
+    <h4>There is no presentation content here.</h4>
+</div>
+
+<hr />
+
+<!-- Import PowerPoint -->
+<form asp-action="ImportPowerPoint" method="post" enctype="multipart/form-data">
+    <label for="pptFile">Import PowerPoint:</label>
+    <input type="file" id="pptFile" name="pptFile" accept=".ppt,.pptx" />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<!-- Export PowerPoint -->
+<div style="margin-top: 20px;">
+    <button type="button" class="btn btn-success" onclick="exportPowerPoint()">Export PowerPoint</button>
+</div>
+
+<script>
+    // Placeholder for exporting the presentation (requires backend logic)
+    function exportPowerPoint() {
+        alert('Export PowerPoint functionality is not yet implemented.');
+    }
+</script>

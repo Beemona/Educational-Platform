@@ -139,6 +139,13 @@ namespace Quiz.Controllers
             }
 
             var model = await GetRoleSpecificModel(role, facultyId, educationTypeId);
+
+            // Fetch specializations if role is "Student"
+            if (role == "Student")
+            {
+                model.Specializations = await GetSpecializationsAsync(facultyId, educationTypeId);
+            }
+
             return View(model);
         }
 
@@ -185,8 +192,13 @@ namespace Quiz.Controllers
             // Return the specializations as JSON
             var result = specializations.Select(s => new { id = s.Id, name = s.Name }).ToList();
 
+            // Log the retrieved specializations for debugging
+            _logger.LogInformation($"Found {result.Count} specializations for FacultyId: {facultyId}, EducationTypeId: {educationTypeId}.");
+
             return Json(result);
         }
+
+
 
         // Logic for loading dynamic fields based on role (preserved as requested)
         [HttpGet]

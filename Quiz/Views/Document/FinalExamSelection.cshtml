@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Final Exam Selection";
+}
+
+<div class="container">
+    <h1>Select Exam Type</h1>
+    <form asp-action="SelectExamType" method="post">
+        <div class="form-group">
+            <label>Select Exam Type:</label>
+            <select name="examType" class="form-control">
+                <option value="written">Written Exam</option>
+                <option value="oral">Oral Exam</option>
+                <option value="presentation">Presentation</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Next</button>
+    </form>
+</div>

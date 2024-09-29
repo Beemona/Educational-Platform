@@ -84,5 +84,15 @@ app.MapControllerRoute(
     pattern: "Account/{action=Index}/{id?}",
     defaults: new { controller = "Account" });
 
+app.MapControllerRoute(
+        name: "pdf",
+        pattern: "{controller=Document}/{action=UploadPdf}/{id?}",
+        defaults: new { controller = "Document" });
+
+app.MapControllerRoute(
+        name: "layout",
+        pattern: "{controller=Layout}/{action=Index}",
+        defaults: new { controller = "Layout" });
+
 
 app.Run();

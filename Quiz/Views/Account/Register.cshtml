@@ -33,7 +33,12 @@
     <div id="role-specific-fields">
         @if (Model.Role == "Student")
         {
-            @await Html.PartialAsync("_StudentRegistrationPartial", Model)
+            @await Html.PartialAsync("_StudentRegistrationPartial", new StudentRegistrationViewModel
+           {
+               Faculties = Model.Faculties,
+               EducationTypes = Model.EducationTypes,
+               Specializations = Model.Specializations
+           })
         }
         else if (Model.Role == "Teacher")
         {

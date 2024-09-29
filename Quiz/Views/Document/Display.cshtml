@@ -1,0 +1,32 @@
+﻿@{
+    var dataTable = ViewData["DataTable"] as System.Data.DataTable;
+}
+
+@if (dataTable != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (System.Data.DataColumn column in dataTable.Columns)
+                {
+                    <th>@column.ColumnName</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in dataTable.Rows)
+            {
+                <tr>
+                    @foreach (var cell in row.ItemArray)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data available.</p>
+}

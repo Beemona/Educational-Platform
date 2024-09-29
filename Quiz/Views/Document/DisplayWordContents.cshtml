@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Word Document Contents";
+}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+
+    <div class="content">
+        @Html.Raw(ViewData["HtmlContent"])
+    </div>
+
+    <hr />
+
+    <a asp-controller="Document" asp-action="UploadWord" class="btn btn-secondary">Upload Another Word Document</a>
+</div>

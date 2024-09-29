@@ -22,12 +22,12 @@ else
             @foreach (var studentResult in Model)
             {
                 <tr>
-                    <td>@studentResult.StudentName</td>
+                    <td>@studentResult.User?.Name</td>
                     <td>@studentResult.Score.ToString("F2")</td>
                     <td>@studentResult.TotalQuestions</td>
                     <td>
                         <a href="#" data-toggle="modal" data-target="#detailsModal"
-                           data-student="@studentResult.StudentName"
+                           data-student="@studentResult.User?.Name"
                            data-details='@Html.Raw(JsonSerializer.Serialize(studentResult.ResultDetails))'>View Details</a>
                     </td>
                 </tr>

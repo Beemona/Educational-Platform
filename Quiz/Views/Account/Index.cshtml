@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quiz</title>
+    <link rel="stylesheet" href="httpsstackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Ensure body and container styles do not interfere with layout */
+        body {
+            background-color: #f8f9fa; /* Light background color */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Styling for the welcome container to ensure it aligns properly */
+        .welcome-container {
+            text-align: center;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 50px auto; /* Center the container horizontally */
+        }
+
+            /* Styling for heading and paragraph within welcome container */
+            .welcome-container h2 {
+                margin-bottom: 20px;
+                font-size: 2.5rem;
+                color: #333;
+            }
+
+            .welcome-container p {
+                margin-bottom: 30px;
+                font-size: 1.2rem;
+                color: #555;
+            }
+
+        /* Styling for buttons within the button group */
+        .btn-group .btn {
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h2>Welcome to our page</h2>
+        <p>Are you a student or teacher?</p>
+        <div class="btn-group" role="group">
+            <a href="/Account/StudentLogin" class="btn btn-primary">Student</a>
+            <a href="/Account/TeacherLogin" class="btn btn-primary">Teacher</a>
+        </div>
+    </div>
+
+    <!-- Include jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS last -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

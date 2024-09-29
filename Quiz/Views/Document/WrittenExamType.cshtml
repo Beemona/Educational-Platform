@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Written Exam Type";
+    var wordContent = ViewData["WordContent"]?.ToString() ?? "";
+    var excelContent = ViewData["ExcelContent"]?.ToString() ?? "";
+}
+
+<h2>Select Written Exam Type</h2>
+
+<!-- Written Exam Type Selection -->
+<form asp-action="SaveEditedContent" method="post">
+    <div>
+        <label>
+            <input type="radio" name="writtenExamType" value="online" required /> Online
+        </label>
+        <label>
+            <input type="radio" name="writtenExamType" value="onsite" required /> Onsite
+        </label>
+    </div>
+
+    <hr />
+
+    <!-- Word Content Section -->
+    <div>
+        <textarea id="examTextarea" name="textareaContent" rows="10" cols="100" style="width: 100%;" readonly>
+            @wordContent
+        </textarea>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="enableEditing()">Edit</button>
+        <button type="button" class="btn btn-info" onclick="previewContent()">Preview</button>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+
+    @if (ViewData["SavedMessage"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @ViewData["SavedMessage"]
+        </div>
+    }
+</form>
+
+<hr />
+
+<!-- Import Word Document -->
+<form asp-action="ImportWordToTextarea" method="post" enctype="multipart/form-data">
+    <label for="wordFile">Import Word:</label>
+    <input type="file" id="wordFile" name="wordFile" accept=".doc,.docx" />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<!-- Word Preview Modal -->
+<div id="previewModal" style="display:none; margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9;">
+    <h3>Preview</h3>
+    <div id="previewContent" style="white-space: pre-wrap; background-color: white; padding: 10px;"></div>
+    <button type="button" class="btn btn-secondary" onclick="closePreview()">Close Preview</button>
+</div>
+
+<hr />
+
+<!-- Excel Functionality Section -->
+<h2>Select Excel Document</h2>
+
+<!-- Import Excel Document -->
+<form asp-action="ImportExcelToTextarea" method="post" enctype="multipart/form-data">
+    <label for="excelFile">Import Excel:</label>
+    <input type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" />
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<!-- Excel Content Section -->
+<div>
+    <textarea id="excelTextarea" name="excelContent" rows="10" cols="100" style="width: 100%;" readonly>
+        @excelContent
+    </textarea>
+</div>
+
+<div style="margin-top: 20px;">
+    <button type="button" class="btn btn-secondary" onclick="enableExcelEditing()">Edit</button>
+    <button type="button" class="btn btn-info" onclick="previewExcelContent()">Preview</button>
+    <button type="button" class="btn btn-success" onclick="exportToExcel()">Export</button>
+</div>
+
+<!-- Excel Preview Modal -->
+<div id="excelPreviewModal" style="display:none; margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9;">
+    <h3>Excel Preview</h3>
+    <div id="excelPreviewContent" style="white-space: pre-wrap; background-color: white; padding: 10px;"></div>
+    <button type="button" class="btn btn-secondary" onclick="closeExcelPreview()">Close Preview</button>
+</div>
+
+<script>
+    // Enable editing for the Word textarea
+    function enableEditing() {
+        document.getElementById('examTextarea').removeAttribute('readonly');
+    }
+
+    // Enable editing for the Excel textarea
+    function enableExcelEditing() {
+        document.getElementById('excelTextarea').removeAttribute('readonly');
+    }
+
+    // Preview Word content
+    function previewContent() {
+        const textareaContent = document.getElementById('examTextarea').value;
+        document.getElementById('previewContent').innerHTML = textareaContent;
+        document.getElementById('previewModal').style.display = 'block';
+    }
+
+    // Close Word preview modal
+    function closePreview() {
+        document.getElementById('previewModal').style.display = 'none';
+    }
+
+    // Preview Excel content
+    function previewExcelContent() {
+        const excelContent = document.getElementById('excelTextarea').value;
+        document.getElementById('excelPreviewContent').innerHTML = excelContent;
+        document.getElementById('excelPreviewModal').style.display = 'block';
+    }
+
+    // Close Excel preview modal
+    function closeExcelPreview() {
+        document.getElementById('excelPreviewModal').style.display = 'none';
+    }
+
+    // Export to Excel functionality (placeholder for now)
+    function exportToExcel() {
+        alert('Export functionality not implemented yet.');
+    }
+</script>

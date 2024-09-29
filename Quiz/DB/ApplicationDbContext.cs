@@ -50,6 +50,18 @@ namespace QuizDbContext.Data
                 .HasForeignKey(qr => qr.StudentResultId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<StudentResult>()
+               .HasOne(sr => sr.User) // Navigation property
+               .WithMany() // A User can have multiple StudentResults
+               .HasForeignKey(sr => sr.UserId) // UserId links to User table
+               .OnDelete(DeleteBehavior.Cascade); // Configure delete behavior as needed
+
+            modelBuilder.Entity<StudentResult>()
+                .HasOne(sr => sr.Subject) // Navigation property to Subject
+                .WithMany() // Assuming multiple StudentResults can link to the same Subject
+                .HasForeignKey(sr => sr.SubjectId) // SubjectId links to Subject table
+                .OnDelete(DeleteBehavior.Cascade); // Configure delete behavior
+
             // Subject and ClassCard Relationship (Course)
             modelBuilder.Entity<Lesson.Models.Subject>()
                  .HasOne(s => s.CourseCard)
@@ -112,7 +124,6 @@ namespace QuizDbContext.Data
                 .HasValue<Student>("Student")
                 .HasValue<Teacher>("Teacher")
                 .HasValue<Admin>("Admin");
-
 
             // SpecializationSubjects
             modelBuilder.Entity<Specialization>()
@@ -244,8 +255,8 @@ namespace QuizDbContext.Data
             modelBuilder.Entity<Option>()
                 .HasKey(o => o.Id);
 
-            modelBuilder.Entity<StudentResult>()
-                .HasKey(sr => sr.Id);
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.Id); // This should already exist in your base entity mapping
 
             modelBuilder.Entity<QuestionResult>()
                 .HasKey(qr => qr.Id);
@@ -300,9 +311,13 @@ namespace QuizDbContext.Data
                 .Property(o => o.Id)
                 .ValueGeneratedOnAdd();
 
-            //modelBuilder.Entity<StudentResult>()
-            //    .Property(sr => sr.Id)
-            //    .ValueGeneratedOnAdd();
+            modelBuilder.Entity<User>()
+                .Property(u => u.Id)
+                .ValueGeneratedOnAdd(); // Identity column only on User.Id
+
+            modelBuilder.Entity<StudentResult>()
+                .Property(sr => sr.Id)
+                .ValueGeneratedOnAdd(); // Identity column for StudentResult.Id
 
             //modelBuilder.Entity<QuestionResult>()
             //    .Property(qr => qr.Id)

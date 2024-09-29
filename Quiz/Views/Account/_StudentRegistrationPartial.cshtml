@@ -1,0 +1,42 @@
+﻿@model StudentRegistrationViewModel
+
+<div class="form-group">
+    <label asp-for="FacultyId">Faculty</label>
+    <select asp-for="FacultyId" class="form-control">
+        <option value="">Select Faculty</option>
+        @foreach (var faculty in Model.Faculties)
+        {
+            <option value="@faculty.Id" selected="@(faculty.Id == Model.FacultyId)"> @faculty.Name</option>
+        }
+    </select>
+</div>
+
+<div class="form-group">
+    <label asp-for="EducationTypeId">Education Type</label>
+    <select asp-for="EducationTypeId" class="form-control">
+        <option value="">Select Education Type</option>
+        @foreach (var educationType in Model.EducationTypes)
+        {
+            <option value="@educationType.Id" selected="@(educationType.Id == Model.EducationTypeId)"> @educationType.Name</option>
+        }
+    </select>
+</div>
+
+<div class="form-group">
+    <label asp-for="SpecializationId">Specialization</label>
+    <select asp-for="SpecializationId" class="form-control">
+        <option value="">Select Specialization</option>
+        @if (Model.Specializations != null && Model.Specializations.Count > 0)
+        {
+            foreach (var specialization in Model.Specializations)
+            {
+                <option value="@specialization.Id" selected="@(specialization.Id == Model.SpecializationId)">@specialization.Name</option>
+            }
+        }
+        else
+        {
+            <option disabled>No specializations available</option>
+        }
+    </select>
+</div>
+

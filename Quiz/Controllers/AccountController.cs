@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Quiz.Controllers
 {
@@ -24,36 +26,64 @@ namespace Quiz.Controllers
         }
 
         // GET: Account/Login
+        [HttpGet]
         public IActionResult Login() => View();
 
-        // POST: Account/Login
         [HttpPost]
         public async Task<IActionResult> Login(string userName, string password)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == userName && u.PasswordHash == HashPassword(password));
+            _logger.LogInformation("Login attempt for user: {UserName}", userName);
 
-            if (user != null)
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-                    new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
-                    new Claim("UserId", (user.Id ?? 0).ToString())
-                };
-
-                await AddUserClaims(claims, user);
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties { IsPersistent = true };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                return RedirectToAction("Index", "Home");
+                _logger.LogWarning("Username or password is empty.");
+                ModelState.AddModelError("", "Username and password are required.");
+                return View();
             }
 
-            ModelState.AddModelError("", "Invalid login attempt.");
-            return View();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+            if (user == null)
+            {
+                _logger.LogWarning("Invalid login attempt. User not found: {UserName}", userName);
+                ModelState.AddModelError("", "Invalid login attempt. User not found.");
+                return View();
+            }
+
+            var passwordVerificationResult = VerifyPassword(user, password);
+            if (passwordVerificationResult != PasswordVerificationResult.Success)
+            {
+                _logger.LogWarning("Invalid login attempt. Incorrect password for user: {UserName}", userName);
+                ModelState.AddModelError("", "Invalid login attempt. Incorrect password.");
+                return View();
+            }
+
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+        new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
+        new Claim("UserId", user.Id.ToString())
+    };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties { IsPersistent = true };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            _logger.LogInformation("User {UserName} logged in successfully.", userName);
+            return RedirectToAction("MyAccount", "Account");
+        }
+
+        // Password verification
+        private PasswordVerificationResult VerifyPassword(User user, string password)
+        {
+            var passwordHasher = new PasswordHasher<User>(); // Use the User type here
+            return passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+        }
+
+        // Password verification
+        private bool VerifyPassword(string hashedPassword, string password)
+        {
+            return hashedPassword == HashPassword(password);
         }
 
         // Helper method to add claims based on user role
@@ -113,41 +143,39 @@ namespace Quiz.Controllers
             claims.Add(new Claim("TaughtSubjects", string.Join(",", taughtSubjects.Select(s => s.Title))));
         }
 
-        // GET: Account/Register
+        // GET: Account/Register (Select Role)
         [HttpGet]
-        public async Task<IActionResult> Register(int? facultyId, int? educationTypeId)
+        public IActionResult Register()
         {
-            var model = new UserRegistrationViewModel
-            {
-                Faculties = await GetFacultiesAsync(),
-                EducationTypes = await GetEducationTypesAsync(),
-                Specializations = await GetSpecializationsAsync(facultyId, educationTypeId),
-                FacultyId = facultyId ?? 0,
-                EducationTypeId = educationTypeId ?? 0
-            };
-
+            var model = new SelectRoleViewModel();
             return View(model);
         }
 
-        // POST: Account/Register
+        // POST: Account/Register (Handle Role Selection)
         [HttpPost]
-        public async Task<IActionResult> Register(string role, int? facultyId, int? educationTypeId)
+        public IActionResult Register(SelectRoleViewModel model)
         {
-            if (string.IsNullOrEmpty(role))
+            if (string.IsNullOrEmpty(model.Role))
             {
-                return RedirectToAction("Register");
+                ModelState.AddModelError("", "Please select a role.");
+                return View(model); // Return to the same view if no role selected
             }
 
-            var model = await GetRoleSpecificModel(role, facultyId, educationTypeId);
-
-            // Fetch specializations if role is "Student"
-            if (role == "Student")
+            // Redirect to the specific registration page based on the role
+            switch (model.Role)
             {
-                model.Specializations = await GetSpecializationsAsync(facultyId, educationTypeId);
+                case "Student":
+                    return RedirectToAction("StudentRegister");
+                case "Teacher":
+                    return RedirectToAction("TeacherRegister");
+                case "Admin":
+                    return RedirectToAction("AdminRegister");
+                default:
+                    ModelState.AddModelError("", "Invalid role selected.");
+                    return View(model);
             }
-
-            return View(model);
         }
+
 
         // General method to handle role-specific data loading
         private async Task<UserRegistrationViewModel> GetRoleSpecificModel(string role, int? facultyId, int? educationTypeId)
@@ -186,57 +214,22 @@ namespace Quiz.Controllers
         [HttpGet]
         public async Task<IActionResult> GetSpecializations(int? facultyId, int? educationTypeId)
         {
-            // Use the GetSpecializationsAsync method to retrieve filtered specializations
             var specializations = await GetSpecializationsAsync(facultyId, educationTypeId);
-
-            // Return the specializations as JSON
             var result = specializations.Select(s => new { id = s.Id, name = s.Name }).ToList();
 
-            // Log the retrieved specializations for debugging
-            _logger.LogInformation($"Found {result.Count} specializations for FacultyId: {facultyId}, EducationTypeId: {educationTypeId}.");
-
-            return Json(result);
+            return Json(result); // Return filtered specializations as JSON
         }
 
-
-
-        // Logic for loading dynamic fields based on role (preserved as requested)
-        [HttpGet]
-        public async Task<IActionResult> LoadRoleSpecificFields(string role, int? facultyId, int? educationTypeId)
-        {
-            switch (role)
-            {
-                case "Student":
-                    var studentModel = new StudentRegistrationViewModel
-                    {
-                        Faculties = await GetFacultiesAsync(),
-                        EducationTypes = await GetEducationTypesAsync(),
-                        Specializations = await GetSpecializationsAsync(facultyId, educationTypeId)
-                    };
-                    return PartialView("_StudentRegistrationPartial", studentModel);
-
-                case "Teacher":
-                    var teacherModel = new TeacherRegistrationViewModel
-                    {
-                        Departments = await _context.Departments.ToListAsync()
-                    };
-                    return PartialView("_TeacherRegistrationPartial", teacherModel);
-
-                case "Admin":
-                    var adminModel = new AdminRegistrationViewModel();
-                    return PartialView("_AdminRegistrationPartial", adminModel);
-
-                default:
-                    return PartialView("_RegisterErrorPartial");
-            }
-        }
 
         // Logout action
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "Home");
         }
+
 
         // Helper method to hash password
         private string HashPassword(string password)
@@ -273,17 +266,291 @@ namespace Quiz.Controllers
         }
 
         // Teacher-specific registration page (if needed)
+        //[HttpGet]
+        //public async Task<IActionResult> RegisterTeacher()
+        //{
+        //    var departments = await _context.Departments.ToListAsync();
+        //    var teacherModel = new TeacherRegistrationViewModel
+        //    {
+        //        Departments = departments,
+        //        Role = "Teacher"
+        //    };
+
+        //    return PartialView("_TeacherRegistrationPartial", teacherModel);
+        //}
+
+        //NEW REGISTRATION - STANDALONE VIEWS:
+        // Updated redirection to standalone views instead of partials
         [HttpGet]
-        public async Task<IActionResult> RegisterTeacher()
+        public IActionResult SelectRole()
         {
-            var departments = await _context.Departments.ToListAsync();
-            var teacherModel = new TeacherRegistrationViewModel
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult RedirectToRoleForm(SelectRoleViewModel model)
+        {
+            if (string.IsNullOrEmpty(model.Role))
             {
-                Departments = departments,
-                Role = "Teacher"
+                ModelState.AddModelError("", "Please select a role.");
+                return View("SelectRole", model);
+            }
+
+            switch (model.Role)
+            {
+                case "Student":
+                    return RedirectToAction("StudentRegister");
+                case "Teacher":
+                    return RedirectToAction("TeacherRegister");
+                case "Admin":
+                    return RedirectToAction("AdminRegister");
+                default:
+                    ModelState.AddModelError("", "Invalid role selected.");
+                    return View("SelectRole", model);
+            }
+        }
+
+
+        // Student registration GET method
+        [HttpGet]
+        public async Task<IActionResult> StudentRegister()
+        {
+            var model = new StudentRegistrationViewModel
+            {
+                Faculties = await GetFacultiesAsync(),
+                EducationTypes = await GetEducationTypesAsync(),
+                Specializations = await GetSpecializationsAsync(null, null)
+            };
+            return View(model);
+        }
+
+        // Teacher registration GET method
+        [HttpGet]
+        public async Task<IActionResult> TeacherRegister()
+        {
+            var model = new TeacherRegistrationViewModel
+            {
+                Departments = await _context.Departments.ToListAsync()
+            };
+            return View(model);
+        }
+
+        // Admin registration GET method
+        [HttpGet]
+        public IActionResult AdminRegister()
+        {
+            var model = new AdminRegistrationViewModel();
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterStudent(StudentRegistrationViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Log ModelState errors
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    _logger.LogError("ModelState Error: {Error}", error.ErrorMessage);
+                }
+                return RedirectToAction("Error");
+            }
+
+            var student = new Student
+            {
+                Name = model.Name,
+                UserName = model.UserName,
+                Email = model.Email,
+                FacultyId = model.FacultyId,
+                EducationTypeId = model.EducationTypeId,
+                SpecializationId = model.SpecializationId,
+                Role = "Student",
+                IsAdmin = false // Set IsAdmin to false for students
             };
 
-            return PartialView("_TeacherRegistrationPartial", teacherModel);
+            var passwordHasher = new PasswordHasher<Student>();
+            student.PasswordHash = passwordHasher.HashPassword(student, model.Password);
+
+            try
+            {
+                _context.Users.Add(student);
+                await _context.SaveChangesAsync(); // Put a breakpoint here to check student object and exceptions
+            }
+            catch (DbUpdateException dbEx) // Catch database specific exceptions
+            {
+                _logger.LogError(dbEx, "Database error occurred while saving the student. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while saving the student. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+
+            return RedirectToAction("Success");
         }
+
+
+        public IActionResult Error()
+        {
+            // You can pass any necessary data to the view, if needed
+            return View();
+        }
+
+
+        // POST method for teacher registration
+        [HttpPost]
+        public async Task<IActionResult> RegisterTeacher(TeacherRegistrationViewModel model)
+        {
+            // Validate the model state
+            if (!ModelState.IsValid)
+            {
+                // Load departments again if there are validation errors
+                model.Departments = await _context.Departments.ToListAsync();
+                return View("TeacherRegister", model);
+            }
+
+            // Check if a user with the same username or email already exists
+            if (await _context.Users.AnyAsync(u => u.UserName == model.UserName || u.Email == model.Email))
+            {
+                ModelState.AddModelError("", "Username or Email is already in use.");
+                model.Departments = await _context.Departments.ToListAsync();
+                return View("TeacherRegister", model);
+            }
+
+            // Create a new Teacher object
+            var teacher = new Teacher
+            {
+                Name = model.Name,
+                UserName = model.UserName,
+                Email = model.Email,
+                DepartmentId = model.DepartmentId,
+                Role = "Teacher",
+                IsAdmin = false // Set IsAdmin to false for teachers
+            };
+
+            // Hash the password
+            var passwordHasher = new PasswordHasher<Teacher>();
+            teacher.PasswordHash = passwordHasher.HashPassword(teacher, model.Password);
+
+            // Save the new teacher to the database
+            try
+            {
+                _context.Users.Add(teacher);
+                await _context.SaveChangesAsync(); // Save changes to the database
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database error occurred while saving the teacher. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while saving the teacher. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+
+            return RedirectToAction("Success");
+        }
+
+
+        // POST method for admin registration
+        [HttpPost]
+        public async Task<IActionResult> RegisterAdmin(AdminRegistrationViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AdminRegister", model);
+            }
+
+            // Create an Admin user
+            var admin = new Admin
+            {
+                Name = model.Name,
+                UserName = model.UserName,
+                Email = model.Email,
+                Role = "Admin",
+                IsAdmin = true // Admins should have this set to true
+            };
+
+            // Hash the password
+            var passwordHasher = new PasswordHasher<Admin>();
+            admin.PasswordHash = passwordHasher.HashPassword(admin, model.Password);
+
+            try
+            {
+                _context.Users.Add(admin);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database error occurred while saving the admin. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while saving the admin. User: {UserName}, Email: {Email}", model.UserName, model.Email);
+                return RedirectToAction("Error");
+            }
+
+            return RedirectToAction("Success");
+        }
+
+        public IActionResult Success()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> MyAccount()
+        {
+            // Retrieve the UserId claim
+            var userIdString = User.FindFirst("UserId")?.Value;
+
+            // Check if the UserId claim is present and valid
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out var userId))
+            {
+                // If no valid UserId claim is found, redirect to the login page
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Retrieve the user from the database
+            var user = await _context.Users.FindAsync(userId);
+
+            // Check if the user exists
+            if (user == null)
+            {
+                // Optionally log the issue
+                _logger.LogWarning("User with ID {UserId} not found.", userId);
+                return NotFound();
+            }
+
+            // Prepare the model for the view
+            var model = new MyAccountViewModel
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Role = user.Role
+            };
+
+            // Load role-specific data
+            if (user is Student student)
+            {
+                model.Faculty = await _context.Faculties.FindAsync(student.FacultyId);
+                model.EducationType = await _context.EducationTypes.FindAsync(student.EducationTypeId);
+                model.Specialization = await _context.Specializations.FindAsync(student.SpecializationId);
+            }
+            else if (user is Teacher teacher)
+            {
+                model.Department = await _context.Departments.FindAsync(teacher.DepartmentId);
+            }
+
+            return View(model);
+        }
+
+
+
     }
 }

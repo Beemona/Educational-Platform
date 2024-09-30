@@ -2,10 +2,14 @@
 
 @using (Html.BeginForm("SubmitQuiz", "Quiz", FormMethod.Post))
 {
-    <div class="form-group">
-        <label for="studentName">Your Name:</label>
-        <input type="text" id="studentName" name="StudentName" class="form-control" required />
-    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h1>Welcome, @User.Identity.Name!</h1>
+    }
+    else
+    {
+        <h1>Welcome, Guest!</h1>
+    }
 
     @if (Model.Questions == null || !Model.Questions.Any())
     {
@@ -67,7 +71,7 @@
                     @foreach (var option in question.Options)
                     {
                         <label>
-                            <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Value" />
+                            <input type="radio" name="Questions[@i].SelectedAnswer" value="@option.Text" />
                             @option.Text
                         </label>
                         <br />
@@ -83,5 +87,4 @@
 
         <button type="submit" class="btn btn-primary">Submit Quiz</button>
     }
-}
- *@
+} *@

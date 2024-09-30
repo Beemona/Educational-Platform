@@ -24,3 +24,7 @@ public class UserRegistrationViewModel
     public List<Specialization>? Specializations { get; set; }
     public List<Department>? Departments { get; set; }
 }
+public class SelectRoleViewModel
+{
+    public string? Role { get; set; }
+}

@@ -1,0 +1,53 @@
+﻿@model Authentication.Models.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<h3>Manage Specializations</h3>
+<a class="btn btn-primary" asp-action="CreateSpecialization">Create New Specialization</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var specialization in Model.Specializations)
+        {
+            <tr>
+                <td>@specialization.Name</td>
+                <td>
+                    <a class="btn btn-warning" asp-action="EditSpecialization" asp-route-id="@specialization.Id">Edit</a>
+                    <a class="btn btn-danger" asp-action="DeleteSpecialization" asp-route-id="@specialization.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Manage Departments</h3>
+<a class="btn btn-primary" asp-action="CreateDepartment">Create New Department</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var department in Model.Departments)
+        {
+            <tr>
+                <td>@department.Name</td>
+                <td>
+                    <a class="btn btn-warning" asp-action="EditDepartment" asp-route-id="@department.Id">Edit</a>
+                    <a class="btn btn-danger" asp-action="DeleteDepartment" asp-route-id="@department.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

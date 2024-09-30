@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Error";
+}
+
+<h2>Registration Error</h2>
+
+<p>There has been a problem with saving your account. Please try again.</p>
+
+<script>
+    // Redirect back to the registration page after a few seconds
+    setTimeout(function () {
+        window.location.href = '@Url.Action("StudentRegister", "Account")';
+    }, 3000); // 3 seconds delay
+</script>

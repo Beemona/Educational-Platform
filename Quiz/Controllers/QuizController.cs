@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QuestionModel.Models;
 using Quiz.Models;
 using QuizDbContext.Data;
@@ -26,12 +28,44 @@ namespace QuizController.Controllers
         }
 
         // GET: /Quiz/Index
+        //public async Task<IActionResult> Index()
+        //{
+        //    var questions = await _quizService.GetAllQuestionsAsync();
+
+        //    var viewModel = new QuizViewModel
+        //    {
+        //        Questions = questions.Select(q => new QuestionAnswerViewModel
+        //        {
+        //            QuestionId = q.Id,
+        //            QuestionText = q.Text,
+        //            Options = q.Options?.Select(o => new OptionViewModel
+        //            {
+        //                Text = o.Text,
+        //                IsCorrect = o.IsCorrect
+        //            }).ToList()
+        //        }).ToList()
+        //    };
+
+        //    return View(viewModel);
+        //}
+
+        // GET: /Quiz/Index
+        [Authorize]
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Error", "Account");
+            }
             var questions = await _quizService.GetAllQuestionsAsync();
+
+            // Get the current user's ID and retrieve their name
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _context.Users.FindAsync(userId);
 
             var viewModel = new QuizViewModel
             {
+                StudentName = user?.Name ?? "Guest", // Fallback to "Guest" if user is null
                 Questions = questions.Select(q => new QuestionAnswerViewModel
                 {
                     QuestionId = q.Id,
@@ -46,27 +80,6 @@ namespace QuizController.Controllers
 
             return View(viewModel);
         }
-
-        //public IActionResult Index()
-        //{
-        //    var questions = _questionService.GetAllQuestions();
-
-        //    var viewModel = new QuizViewModel
-        //    {
-        //        Questions = questions.Select(q => new QuestionAnswerViewModel
-        //        {
-        //            QuestionId = q.Id,
-        //            QuestionText = q.Text,
-        //            Options = q.Options?.Select(o => new Quiz.Models.OptionViewModel
-        //            {
-        //                Value = o.Value,
-        //                Text = o.Text
-        //            }).ToList()
-        //        }).ToList()
-        //    };
-
-        //    return View(viewModel);
-        //}
 
         // POST: /Quiz/SubmitQuiz
         [HttpPost]
@@ -94,11 +107,9 @@ namespace QuizController.Controllers
 
                 // Find the selected option in the current question
                 var selectedOption = dbQuestion.Options?.FirstOrDefault(o => o.Text == question.SelectedAnswer);
-
-                // Determine the correct option based on IsCorrect
                 var correctOption = dbQuestion.Options?.FirstOrDefault(o => o.IsCorrect);
 
-                // Check if the selected answer is correct
+                // Determine if the selected answer is correct
                 bool isCorrect = selectedOption != null && selectedOption.IsCorrect;
 
                 if (isCorrect)
@@ -111,88 +122,42 @@ namespace QuizController.Controllers
                     QuestionText = dbQuestion.Text,
                     SelectedAnswer = selectedOption?.Text ?? "N/A",
                     CorrectAnswer = correctOption?.Text ?? "N/A",
-                    Points = isCorrect ? dbQuestion.Points : 0, // Points if correct, otherwise 0
+                    Points = isCorrect ? dbQuestion.Points : 0,
                 });
             }
 
-            // Get the current user's ID from claims
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            // Retrieve the user from the database
-            var user = await _context.Users.FindAsync(userId);
+            // Get the current user's name from claims (assuming you have a name claim)
+            var studentName = User.FindFirstValue(ClaimTypes.Name);
+
+            // Fetch the user based on their StudentName
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Name == studentName);
             if (user == null)
             {
-                return NotFound(); // Handle the case where the user isn't found
+                return NotFound(); // Handle case where user isn't found
             }
 
+            // You might need to pass the SubjectId through your model or fetch it from the relevant context
+            int subjectId = model.SubjectId; // Make sure SubjectId is available in your model
+
+            // Create a new StudentResult
             var studentResult = new StudentResult
             {
-                Id = user.Id, // Change this from model.Name to model.StudentName
                 StudentName = user.Name,
                 Score = score, // Use the accumulated score
                 TotalQuestions = model.Questions.Count,
-                ResultDetails = resultDetails // Use the results built in the loop
+                SubjectId = subjectId, // Set the SubjectId here
+                ResultDetails = resultDetails // Add the list of QuestionResults
             };
 
             await _context.StudentResults.AddAsync(studentResult);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Teacher");
+            // Redirect to a confirmation page or results page
+            return RedirectToAction("QuizResult", new { id = studentResult.Id });
         }
 
-        //[HttpPost]
-        //public IActionResult SubmitQuiz(QuizViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return View(model);
-        //    }
 
-        //    var questions = _questionService.GetAllQuestions();
-        //    decimal score = 0;
-        //    var resultDetails = new List<QuestionResult>();
 
-        //    foreach (var question in model.Questions)
-        //    {
-        //        // Log the received data
-        //        System.Diagnostics.Debug.WriteLine($"QuestionId: {question.QuestionId}, SelectedAnswer: {question.SelectedAnswer}");
-        //    }
-
-        //    foreach (var question in questions)
-        //    {
-        //        var selectedAnswer = model.Questions?
-        //            .FirstOrDefault(q => q.QuestionId == question.Id)?
-        //            .SelectedAnswer;
-
-        //        var selectedOption = question.Options?.FirstOrDefault(o => o.Value == selectedAnswer);
-        //        var correctOption = question.Options?.FirstOrDefault(o => o.Value == question.CorrectAnswer);
-        //        var isCorrect = selectedAnswer == question.CorrectAnswer;
-
-        //        if (isCorrect)
-        //        {
-        //            score += question.Points;
-        //        }
-
-        //        resultDetails.Add(new QuestionResult
-        //        {
-        //            QuestionText = question.Text,
-        //            SelectedAnswer = selectedOption?.Text ?? "N/A",
-        //            CorrectAnswer = correctOption?.Text ?? "N/A",
-        //            Points = isCorrect ? question.Points : 0
-        //        });
-        //    }
-
-        //    var studentResult = new StudentResult
-        //    {
-        //        StudentName = model.StudentName,
-        //        Score = score,
-        //        TotalQuestions = questions.Count,
-        //        ResultDetails = resultDetails
-        //    };
-
-        //    _studentResultService.SaveStudentResult(studentResult);
-
-        //    return RedirectToAction("Index", "Teacher");
-        //}
 
     }
 }

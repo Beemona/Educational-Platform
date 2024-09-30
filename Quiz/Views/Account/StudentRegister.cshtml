@@ -1,0 +1,94 @@
+﻿@model StudentRegistrationViewModel
+
+<h2>Student Registration</h2>
+
+<form asp-action="RegisterStudent" method="post">
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="UserName">Username</label>
+        <input asp-for="UserName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="facultyId">Faculty</label>
+        <select id="facultyId" name="FacultyId" class="form-control">
+            <option value="">-- Select Faculty --</option>
+            @foreach (var faculty in Model.Faculties)
+            {
+                <option value="@faculty.Id">@faculty.Name</option>
+            }
+        </select>
+    </div>
+
+    <!-- Education Type Dropdown -->
+    <div class="form-group">
+        <label for="educationTypeId">Education Type</label>
+        <select id="educationTypeId" name="EducationTypeId" class="form-control">
+            <option value="">-- Select Education Type --</option>
+            @foreach (var educationType in Model.EducationTypes)
+            {
+                <option value="@educationType.Id">@educationType.Name</option>
+            }
+        </select>
+    </div>
+
+    <!-- Specialization Dropdown (to be dynamically updated) -->
+    <div class="form-group">
+        <label for="specializationId">Specialization</label>
+        <select id="specializationId" name="SpecializationId" class="form-control">
+            <option value="">-- Select Specialization --</option>
+        </select>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+<!-- JavaScript Section -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Event handler for FacultyId and EducationTypeId change
+        $('#facultyId, #educationTypeId').change(function () {
+            var facultyId = $('#facultyId').val();
+            var educationTypeId = $('#educationTypeId').val();
+
+            if (facultyId && educationTypeId) {
+                // Make an AJAX request to get filtered specializations
+                $.ajax({
+                    url: '@Url.Action("GetSpecializations", "Account")',
+                    data: {
+                        facultyId: facultyId,
+                        educationTypeId: educationTypeId
+                    },
+                    success: function (data) {
+                        // Clear and populate the Specialization dropdown
+                        var specializationDropdown = $('#specializationId');
+                        specializationDropdown.empty();
+                        specializationDropdown.append('<option value="">-- Select Specialization --</option>');
+
+                        $.each(data, function (index, specialization) {
+                            specializationDropdown.append('<option value="' + specialization.id + '">' + specialization.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                // Clear the Specialization dropdown if either FacultyId or EducationTypeId is not selected
+                $('#specializationId').empty();
+                $('#specializationId').append('<option value="">-- Select Specialization --</option>');
+            }
+        });
+    });
+</script>
+

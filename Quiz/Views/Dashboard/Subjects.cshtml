@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Subjects";
+    Layout = "_Layout"; // Assuming you have a layout file.
+}
+
+<h2>Subjects</h2>
+<ul class="list-group">
+    @foreach (var subject in ViewBag.Subjects as IEnumerable<dynamic>) // Use dynamic for anonymous type
+    {
+        <li class="list-group-item">
+            <a href="@Url.Action("Details", "Course", new { id = subject.Id })">
+                <!-- Link to details -->
+                @subject.Title <!-- Display the subject title -->
+            </a>
+        </li>
+    }
+</ul>

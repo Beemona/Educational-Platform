@@ -344,6 +344,9 @@ namespace Quiz.Migrations
                     b.Property<string>("IconUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Semester")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("SeminarCardId")
                         .HasColumnType("int");
 
@@ -403,6 +406,9 @@ namespace Quiz.Migrations
 
                     b.Property<decimal>("Points")
                         .HasColumnType("decimal(5, 2)");
+
+                    b.Property<int>("QuizType")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
@@ -571,7 +577,15 @@ namespace Quiz.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<int?>("Group")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<int?>("SpecializationId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Year")
                         .IsRequired()
                         .HasColumnType("int");
 

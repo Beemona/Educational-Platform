@@ -32,6 +32,12 @@ namespace Authentication.Models
 
     public class Student : User
     {
+        [Required]
+        public int? Year { get; set; }
+
+        [Required]
+        public int? Group { get; set; }
+
         // Access to 1 EducationType, 1 Faculy, 1 Specialization, multiple AccessibleSubjects
         [Required]
         public int? FacultyId { get; set; }

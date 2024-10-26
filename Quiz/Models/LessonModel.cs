@@ -15,6 +15,8 @@ namespace Lesson.Models
         public string? SeminarProfessor { get; set; }
         public string? IconUrl { get; set; }
         public string? BackgroundColor { get; set; }
+        public string? Semester { get; set; }
+
 
         public int? CourseCardId { get; set; }
         public ClassCard? CourseCard { get; set; }

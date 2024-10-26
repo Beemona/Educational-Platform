@@ -1,4 +1,5 @@
-﻿using QuestionModel.Models;
+﻿using Lesson.Models;
+using QuestionModel.Models;
 
 namespace Quiz.Models
 {
@@ -6,6 +7,9 @@ namespace Quiz.Models
     {
         public string? StudentName { get; set; }
         public List<QuestionAnswerViewModel>? Questions { get; set; }
+
+        public int SubjectId { get; set; }
+        public Subject? Subject { get; set; }
     }
 
     public class QuestionAnswerViewModel

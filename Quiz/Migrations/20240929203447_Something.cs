@@ -33,7 +33,12 @@ namespace Quiz.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    // Add additional foreign keys if necessary
+                    table.ForeignKey(
+                        name: "FK_StudentResults_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
         }
 

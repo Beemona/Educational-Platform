@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Grades";
+    Layout = "_Layout";
+}
+
+<h2>Select Subject, Year, and Group</h2>
+
+<form method="post" action="@Url.Action("ShowGrades", "Dashboard")">
+    <div class="form-group">
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject" class="form-control">
+            @foreach (var subject in ViewBag.Subjects as List<string>)
+            {
+                <option value="@subject">@subject</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="year">Year</label>
+        <select id="year" name="year" class="form-control">
+            @foreach (var year in ViewBag.Years as List<string>)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="group">Group</label>
+        <select id="group" name="group" class="form-control">
+            @foreach (var group in ViewBag.Groups as List<string>)
+            {
+                <option value="@group">@group</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

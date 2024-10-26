@@ -104,27 +104,110 @@ namespace QuizController.Controllers
                 {
                     continue; // Skip if no matching question is found
                 }
-
-                // Find the selected option in the current question
-                var selectedOption = dbQuestion.Options?.FirstOrDefault(o => o.Text == question.SelectedAnswer);
-                var correctOption = dbQuestion.Options?.FirstOrDefault(o => o.IsCorrect);
-
-                // Determine if the selected answer is correct
-                bool isCorrect = selectedOption != null && selectedOption.IsCorrect;
-
-                if (isCorrect)
+                //////////////////////////////////////////////////////////
+                switch (dbQuestion.QuizType)
                 {
-                    score += dbQuestion.Points; // Accumulate score based on correct answers
+                    case QuizType.SingleAnswer:
+                        var selectedOptionSingle = dbQuestion.Options?.FirstOrDefault(o => o.Text == question.SelectedAnswer);
+                        var correctOptionSingle = dbQuestion.Options?.FirstOrDefault(o => o.IsCorrect);
+
+                        if (selectedOptionSingle != null && selectedOptionSingle.IsCorrect)
+                        {
+                            score += dbQuestion.Points; // Accumulate score
+                        }
+
+                        resultDetails.Add(new QuestionResult
+                        {
+                            QuestionText = dbQuestion.Text,
+                            SelectedAnswer = selectedOptionSingle?.Text ?? "N/A",
+                            CorrectAnswer = correctOptionSingle?.Text ?? "N/A",
+                            Points = selectedOptionSingle != null && selectedOptionSingle.IsCorrect ? dbQuestion.Points : 0,
+                        });
+                        break;
+
+                    case QuizType.MultipleAnswers:
+                        var selectedAnswers = question.SelectedAnswer?.Split(',').Select(a => a.Trim()).ToList();
+                        var correctOptions = dbQuestion.Options?.Where(o => o.IsCorrect).Select(o => o.Text).ToList();
+
+                        if (selectedAnswers != null && selectedAnswers.Count >= 2 &&
+                            selectedAnswers.Intersect(correctOptions).Count() == correctOptions.Count)
+                        {
+                            score += dbQuestion.Points; // Accumulate score
+                        }
+
+                        resultDetails.Add(new QuestionResult
+                        {
+                            QuestionText = dbQuestion.Text,
+                            SelectedAnswer = string.Join(", ", selectedAnswers),
+                            CorrectAnswer = string.Join(", ", correctOptions),
+                            Points = selectedAnswers != null && selectedAnswers.Count >= 2 &&
+                                     selectedAnswers.Intersect(correctOptions).Count() == correctOptions.Count ?
+                                     dbQuestion.Points : 0,
+                        });
+                        break;
+
+                    case QuizType.OpenQuestion:
+                    case QuizType.Report:
+                        // Manually graded questions: you can handle scoring logic or grading here
+                        // Assuming teacher will input score later or you can implement auto-scoring logic based on input.
+                        resultDetails.Add(new QuestionResult
+                        {
+                            QuestionText = dbQuestion.Text,
+                            SelectedAnswer = question.SelectedAnswer,
+                            CorrectAnswer = "Graded by teacher", // Or handle logic as necessary
+                            Points = 0 // Initially no points; to be graded by teacher
+                        });
+                        break;
+
+                    case QuizType.AddValue:
+                        // Example: handle an expression like "1 + 1 = _"
+                        // Assuming the question has a predefined correct answer
+                        var expectedAnswer = "2"; // For example, retrieve from dbQuestion's text or options
+                        if (question.SelectedAnswer == expectedAnswer)
+                        {
+                            score += dbQuestion.Points; // Accumulate score
+                        }
+
+                        resultDetails.Add(new QuestionResult
+                        {
+                            QuestionText = dbQuestion.Text,
+                            SelectedAnswer = question.SelectedAnswer,
+                            CorrectAnswer = expectedAnswer,
+                            Points = question.SelectedAnswer == expectedAnswer ? dbQuestion.Points : 0,
+                        });
+                        break;
+
+                    case QuizType.Mixed:
+                        // This can include logic for a mix of question types
+                        // For simplicity, you might iterate through sub-questions or handle it as needed
+                        break;
+
+                    default:
+                        continue; // Unknown question type, skip
                 }
-
-                resultDetails.Add(new QuestionResult
-                {
-                    QuestionText = dbQuestion.Text,
-                    SelectedAnswer = selectedOption?.Text ?? "N/A",
-                    CorrectAnswer = correctOption?.Text ?? "N/A",
-                    Points = isCorrect ? dbQuestion.Points : 0,
-                });
             }
+
+            //////////////////////////////////////////////////////////
+            // Find the selected option in the current question
+            //var selectedOption = dbQuestion.Options?.FirstOrDefault(o => o.Text == question.SelectedAnswer);
+            //    var correctOption = dbQuestion.Options?.FirstOrDefault(o => o.IsCorrect);
+
+            //    // Determine if the selected answer is correct
+            //    bool isCorrect = selectedOption != null && selectedOption.IsCorrect;
+
+            //    if (isCorrect)
+            //    {
+            //        score += dbQuestion.Points; // Accumulate score based on correct answers
+            //    }
+
+            //    resultDetails.Add(new QuestionResult
+            //    {
+            //        QuestionText = dbQuestion.Text,
+            //        SelectedAnswer = selectedOption?.Text ?? "N/A",
+            //        CorrectAnswer = correctOption?.Text ?? "N/A",
+            //        Points = isCorrect ? dbQuestion.Points : 0,
+            //    });
+            //}
 
             // Get the current user's name from claims (assuming you have a name claim)
             var studentName = User.FindFirstValue(ClaimTypes.Name);

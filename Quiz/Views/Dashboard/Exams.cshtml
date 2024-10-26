@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "Exams";
+    Layout = "_Layout"; // Assuming you have a layout file.
+}
+
+<h2>Exams</h2>
+<ul class="list-group">
+    @foreach (var exam in ViewBag.Exams as List<string>)
+    {
+        <li class="list-group-item">
+            @if (exam == "Create Grade Formula")
+            {
+                <a href="@Url.Action("CreateGradeFormula", "Dashboard")">@exam</a>
+            }else if (exam == "Create Quiz")
+            {
+                <a href="@Url.Action("Create", "QuizCreation")">@exam</a>
+            }
+            else
+            {
+                <a href="#">@exam</a> <!-- Placeholder for other exams -->
+            }
+        </li>
+    }
+</ul>

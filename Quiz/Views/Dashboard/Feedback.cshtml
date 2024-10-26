@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Feedback";
+    Layout = "_Layout"; // Assuming you have a layout file.
+}
+
+<h2>Feedback</h2>
+<ul class="list-group">
+    @foreach (var feedbackItem in ViewBag.Feedback as List<string>)
+    {
+        <li class="list-group-item">@feedbackItem</li>
+    }
+</ul>

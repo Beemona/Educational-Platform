@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Filtered Student Grades";
+    Layout = "_Layout";
+}
+@using StudentModel.Models
+
+<h2>Filtered Grades for @ViewBag.Subject (Year: @ViewBag.Year, Group: @ViewBag.Group)</h2>
+
+@if (ViewBag.GradeFormula != null)
+{
+    <div class="alert alert-info">
+        <h4>Grade Formula:</h4>
+        <p>
+            Seminar Weight: @ViewBag.GradeFormula.SeminarWeight%<br />
+            Course Weight: @ViewBag.GradeFormula.CourseWeight%<br />
+            Final Exam Weight: @ViewBag.GradeFormula.FinalExamWeight%<br />
+            Total Points: @ViewBag.GradeFormula.DefaultPoints
+        </p>
+    </div>
+}
+
+@if (ViewBag.FilteredResults is List<StudentGrade> studentGrades && studentGrades.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Course Points</th>
+                <th>Seminar Points</th>
+                <th>Final Exam Points</th>
+                <th>Bonus Points</th>
+                <th>Grade</th>
+                <th>Pass/Fail</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in studentGrades)
+            {
+                <tr class="@((result.Status == "Passed") ? "passed" : "failed")">
+                    <td>@result.Name</td>
+                    <td>@result.CoursePoints</td>
+                    <td>@result.SeminarPoints</td>
+                    <td>@result.FinalExamPoints</td>
+                    <td>@result.BonusPoints</td>
+                    <td>@result.Grade</td>
+                    <td>@result.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No results found for the selected criteria.</p>
+}
+
+<style>
+    /* Define styles for Passed (green) and Failed (red) */
+    .passed {
+        background-color: #d4edda !important; /* Light green */
+    }
+
+    .failed {
+        background-color: #f8d7da !important; /* Light red */
+    }
+</style>

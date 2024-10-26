@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "_Layout"; // Assuming you have a layout file.
+}
+
+<!-- Include Bootstrap CSS (if not already included in your layout) -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <h1 class="text-center">Teacher Dashboard</h1>
+    <div class="row mt-4">
+
+        <!-- Subjects Card -->
+        <div class="col-md-3 mb-4">
+            <a href="/Dashboard/Subjects" class="card text-decoration-none">
+                <div class="card-header bg-primary text-white">
+                    <h5>Subjects</h5>
+                </div>
+                <div class="card-body">
+                    <p>Click to view subjects.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Exams Card -->
+        <div class="col-md-3 mb-4">
+            <a href="/Dashboard/Exams" class="card text-decoration-none">
+                <div class="card-header bg-success text-white">
+                    <h5>Exams</h5>
+                </div>
+                <div class="card-body">
+                    <p>Click to view exams.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Grades Card -->
+        <div class="col-md-3 mb-4">
+            <a href="/Dashboard/Grades" class="card text-decoration-none">
+                <div class="card-header bg-warning text-white">
+                    <h5>Student's Grades</h5>
+                </div>
+                <div class="card-body">
+                    <p>Click to view student grades.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Feedback Card -->
+        <div class="col-md-3 mb-4">
+            <a href="/Dashboard/Feedback" class="card text-decoration-none">
+                <div class="card-header bg-info text-white">
+                    <h5>Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <p>Click to view feedback.</p>
+                </div>
+            </a>
+        </div>
+
+    </div>
+</div>
+

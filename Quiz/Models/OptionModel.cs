@@ -16,4 +16,3 @@ namespace OptionModel.Models
         public Question? Question { get; set; } // Navigation property
     }
 }
- //    public string? Value { get; set; } // e.g., "A", "B", "C", "D" OLD!!

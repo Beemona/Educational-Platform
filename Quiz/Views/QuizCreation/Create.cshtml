@@ -5,7 +5,7 @@
 <form asp-controller="QuizCreation" asp-action="Create" method="post">
     <div class="form-group">
         <label for="SelectedFormat">Select Quiz Format</label>
-        <select id="SelectedFormat" name="SelectedFormat" class="form-control">
+        <select id="SelectedFormat" name="SelectedFormat" class="form-control" onchange="handleFormatChange(this)">
             <option value="SingleAnswer">Single Answer</option>
             <option value="MultipleAnswers">Multiple Answers</option>
             <option value="OpenQuestion">Open Question</option>
@@ -17,7 +17,7 @@
 
     <div class="form-group">
         <label for="NumberOfQuestions">Number of Questions</label>
-        <input type="number" id="NumberOfQuestions" name="NumberOfQuestions" class="form-control" />
+        <input type="number" id="NumberOfQuestions" name="NumberOfQuestions" class="form-control" min="1" />
     </div>
 
     <div class="form-check">
@@ -25,8 +25,61 @@
         <label class="form-check-label" for="IsRandomized">Randomize Questions</label>
     </div>
 
+    <div id="questionInputs">
+        <!-- Dynamic content based on selected quiz format -->
+        <h3>Enter Question Details</h3>
+
+        <!-- SingleAnswer and MultipleAnswers -->
+        <div id="optionInput" class="d-none">
+            <div class="form-group">
+                <label for="QuestionText">Question Text</label>
+                <input type="text" id="QuestionText" name="QuestionText" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Options">Enter Options</label>
+                <textarea id="Options" name="Options" class="form-control" rows="3" placeholder="Enter options, separated by commas"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="CorrectAnswers">Correct Answer(s)</label>
+                <input type="text" id="CorrectAnswers" name="CorrectAnswers" class="form-control" placeholder="Correct answer(s), separated by commas if multiple" />
+            </div>
+        </div>
+
+        <!-- OpenQuestion and Report -->
+        <div id="openInput" class="d-none">
+            <div class="form-group">
+                <label for="QuestionTextOpen">Question Text</label>
+                <textarea id="QuestionTextOpen" name="QuestionTextOpen" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="TeacherNote">Teacher Notes</label>
+                <textarea id="TeacherNote" name="TeacherNote" class="form-control" rows="2" placeholder="Add any additional instructions for the teacher"></textarea>
+            </div>
+        </div>
+
+        <!-- AddValue -->
+        <div id="addValueInput" class="d-none">
+            <div class="form-group">
+                <label for="QuestionTextAddValue">Question Text (e.g., 1 + 1 = _ )</label>
+                <textarea id="QuestionTextAddValue" name="QuestionTextAddValue" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="CorrectAnswerAddValue">Correct Answer</label>
+                <input type="text" id="CorrectAnswerAddValue" name="CorrectAnswerAddValue" class="form-control" placeholder="Correct answer" />
+            </div>
+        </div>
+
+        <!-- Mixed -->
+        <div id="mixedInput" class="d-none">
+            <div class="form-group">
+                <label for="MixedInstructions">Instructions for Mixed Format</label>
+                <textarea id="MixedInstructions" name="MixedInstructions" class="form-control" rows="3" placeholder="Provide instructions or details on the combination of quiz types"></textarea>
+            </div>
+        </div>
+    </div>
+
     <div class="form-group">
-        <h3>Select Questions</h3>
+        <h3>Select Questions from Subject</h3>
         @foreach (var table in Model.SubjectTables)
         {
             <div>
@@ -38,3 +91,23 @@
 
     <button type="submit" class="btn btn-primary">Create Quiz</button>
 </form>
+
+<script>
+    function handleFormatChange(select) {
+        var format = select.value;
+        document.getElementById("optionInput").classList.add("d-none");
+        document.getElementById("openInput").classList.add("d-none");
+        document.getElementById("addValueInput").classList.add("d-none");
+        document.getElementById("mixedInput").classList.add("d-none");
+
+        if (format === "SingleAnswer" || format === "MultipleAnswers") {
+            document.getElementById("optionInput").classList.remove("d-none");
+        } else if (format === "OpenQuestion" || format === "Report") {
+            document.getElementById("openInput").classList.remove("d-none");
+        } else if (format === "AddValue") {
+            document.getElementById("addValueInput").classList.remove("d-none");
+        } else if (format === "Mixed") {
+            document.getElementById("mixedInput").classList.remove("d-none");
+        }
+    }
+</script>
